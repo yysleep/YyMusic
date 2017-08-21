@@ -1,0 +1,241 @@
+package com.example.administrator.yymusic.ui.main;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.example.administrator.yymusic.R;
+import com.example.administrator.yymusic.api.IFileOperationCallback;
+import com.example.administrator.yymusic.api.ITaskInterface;
+import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.sys.MusicPlayer;
+import com.example.administrator.yymusic.sys.MusicSys;
+import com.example.administrator.yymusic.tool.FileOperationTask;
+import com.example.administrator.yymusic.tool.MusicAdapter;
+import com.example.administrator.yymusic.ui.base.BaseFragment;
+import com.example.administrator.yymusic.utils.ShareUtils;
+
+/**
+ * Created by Administrator on 2016/5/25.
+ *
+ * @author yysleep
+ */
+public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
+
+    private View view;
+    private MusicAdapter musicApapter;
+    Handler handler;
+    private MusicInfo mInfo;
+    private int mPosition = -1;
+    private FileOperationTask mfileTask;
+    private IFileOperationCallback callback;
+
+    public MusicLocalFragment(IFileOperationCallback callback) {
+        this.callback = callback;
+    }
+
+    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST)) {
+                if (musicApapter == null)
+                    return;
+                musicApapter.musicInfos = MusicSys.getInstance().getLocalMusics();
+                musicApapter.setOutsideChange(true);
+                musicApapter.notifyDataSetChanged();
+            }
+        }
+    };
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (view == null) {
+            view = inflater.inflate(R.layout.fragment_local_music, container, false);
+        }
+        initView();
+        return view;
+    }
+
+    public void initView() {
+        ListView lvMusic = (ListView) view.findViewById(R.id.music_local_frgment_lv);
+        musicApapter = new MusicAdapter(getActivity(), MusicSys.getInstance().getLocalMusics(), lvMusic, TAG());
+        handler = new Handler();
+        IntentFilter intentFilter = new IntentFilter(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+        getActivity().registerReceiver(updateReceiver, intentFilter);
+        if (lvMusic != null) {
+            lvMusic.setAdapter(musicApapter);
+            lvMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    if (MusicSys.getInstance().getLocalMusics().get(i).getIsPlaying() == 1)
+                        return;
+
+                    MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 0);
+                    MusicPlayer.isPauseByMyself = false;
+                }
+            });
+
+            lvMusic.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    mInfo = (MusicInfo) parent.getAdapter().getItem(position);
+                    if (mInfo != null && position >= 0)
+                        showAlert(position);
+                    return true;
+                }
+            });
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (musicApapter.getItem(musicApapter.getCount() - 1).getBitmap() == null) {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            musicApapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    @Override
+    protected String TAG() {
+        return "MusicLocalFragment";
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(updateReceiver);
+        if (musicApapter != null) {
+            musicApapter.clear();
+            musicApapter = null;
+        }
+    }
+
+    @Override
+    public void refreshInfo(UpdateInfo info) {
+        if (info == null || info.getUpdateTitle() == null)
+            return;
+
+        if (musicApapter == null) {
+            return;
+        }
+
+        Log.i(TAG(), info.toString());
+        // 判断是否有歌曲显示为播放状态
+        boolean isUpdate = false;
+        if (info.getUpdateFragmentNum() != 0) {
+            for (MusicInfo musicInfo : musicApapter.musicInfos) {
+                if (musicInfo.getIsPlaying() != 0) {
+                    musicInfo.setIsPlaying(0);
+                    isUpdate = true;
+                    break;
+                }
+            }
+            if (isUpdate) {
+                musicApapter.notifyDataSetChanged();
+            }
+            return;
+        }
+        if (info.getUpdatePosition() < 0) {
+            return;
+        }
+        for (MusicInfo musicInfo : musicApapter.musicInfos) {
+            if (musicInfo.getIsPlaying() != 0) {
+                musicInfo.setIsPlaying(0);
+            }
+        }
+        musicApapter.musicInfos.get(info.getUpdatePosition()).setIsPlaying(MusicConst.PLAYING);
+        musicApapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void getBmpSuccess(String url) {
+        if (musicApapter != null)
+            musicApapter.downLoadSuccess(url);
+    }
+
+    private void showAlert(final int position) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MusicLocalFragment.this.getActivity()).
+                setTitle("是否删除文件").
+                setIcon(R.drawable.icon_launcher).
+                setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!ShareUtils.getInstance().getWritePermission()) {
+                            Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除，请去设置界面开启相应的权限", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Log.d(TAG(), "[YyMusic][MusicLocalFragment][onItemLongClick] info = " + mInfo);
+                        if (mInfo.getIsPlaying() == 1) {
+                            Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除正在播放的歌曲", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        mPosition = position;
+                        mfileTask = new FileOperationTask(MusicLocalFragment.this);
+                        String task[] = {FileOperationTask.DELETE_FILE, mInfo.getUrl()};
+                        mfileTask.execute(task);
+
+                    }
+                }).
+                setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).
+                create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void refreshDeleteFile(Boolean reslut) {
+        if (reslut && mPosition >= 0) {
+            String path = mInfo.getUrl();
+            musicApapter.musicInfos.remove(mInfo);
+            if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_LOCAL) {
+                MusicPlayer.getInstance().refreshList(mPosition);
+                Log.d(TAG(), "refreshDeleteFile 当前列表为 本地列表");
+            }
+            musicApapter.notifyDataSetChanged();
+            callback.syncList(path);
+
+            Toast.makeText(MusicLocalFragment.this.getActivity(), "已删除", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(MusicLocalFragment.this.getActivity(), "删除失败,该文件正在播放 或者正在被操作", Toast.LENGTH_SHORT).show();
+        }
+        if (mfileTask != null)
+            mfileTask = null;
+
+    }
+
+}

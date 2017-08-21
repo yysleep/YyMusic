@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:textSize="24sp"
+        android:id="@+id/dialog_title_tv"
+        android:textColor="@color/itemBackground"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:text="是否取消收藏" />
+
+    <Button
+        android:id="@+id/dialog_one_btn"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:text="确定" />
+
+    <Button
+        android:id="@+id/dialog_two_btn"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center"
+        android:text="取消" />
+
+</LinearLayout>

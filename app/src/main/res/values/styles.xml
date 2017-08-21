@@ -1,0 +1,67 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="AppThene.Base">
+
+    </style>
+
+    <style name="SplashTheme" parent="AppThene.Base">
+        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="AppThene.Base" parent="Theme.AppCompat">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+
+        <item name="android:textColorPrimary">@color/white</item>
+        <!-- Actionbar color -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!--Status bar color-->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!--Window color-->
+        <item name="android:windowBackground">@color/back</item>
+
+        <!--<item name="colorAccent">@color/white</item>-->
+
+    </style>
+
+    <style name="MusicTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="android:textSize">24sp</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+    </style>
+
+    <style name="Theme_AudioDialog">
+        <item name="android:windowFrame">@null</item>
+        <!--边框 -->
+        <item name="android:windowIsFloating">true</item>
+        <!--是否浮现在activity之上 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!--半透明 -->
+        <item name="android:windowNoTitle">true</item>
+        <!--无标题 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景透明 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!--模糊 -->
+    </style>
+
+    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.Dark">
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColor">@color/lotWhite</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+    </style>
+
+    <style name="OverflowMenuStyle" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>  <!--设置不覆盖锚点-->
+    </style>
+
+    <style name="YMSeekbarStyle" parent="Base.Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/colorAccent</item>
+
+
+    </style>
+
+</resources>

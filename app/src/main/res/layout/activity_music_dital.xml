@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/music_detil_song_title_tv"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/musicTheme"
+        android:ellipsize="end"
+        android:gravity="bottom|center"
+        android:maxLines="1"
+        android:paddingBottom="6dp"
+        android:scrollHorizontally="true"
+        android:text="当前没有歌曲正在播放"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
+
+<android.support.v4.view.ViewPager
+    android:id="@+id/music_detail_vp"
+    android:layout_weight="1"
+    android:layout_width="match_parent"
+    android:layout_height="0dp">
+
+</android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:textColor="@color/colorAccent"
+            android:id="@+id/music_detil_progress_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingLeft="1dp"
+            android:textSize="10dp"
+            android:visibility="visible" />
+
+        <SeekBar
+            android:id="@+id/music_detil_progress_sk"
+            style="@style/YMSeekbarStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="visible" />
+
+        <TextView
+            android:textColor="@color/colorAccent"
+            android:id="@+id/music_detil_alltime_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingRight="1dp"
+            android:textSize="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_gravity="center"
+            android:id="@+id/music_detil_collect_iv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="24dp"
+            android:onClick="onClickDetil"
+            android:src="@drawable/ic_music_new_collect" />
+
+        <ImageView
+            android:id="@+id/music_detil_last_tv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="24dp"
+            android:onClick="onClickDetil"
+            android:src="@drawable/music_last" />
+
+        <ImageView
+            android:id="@+id/music_detil_play_tv"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:onClick="onClickDetil"
+            android:src="@drawable/ic_music_stop" />
+
+        <ImageView
+            android:id="@+id/music_detil_next_tv"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="24dp"
+            android:onClick="onClickDetil"
+            android:src="@drawable/music_next" />
+
+        <ImageView
+            android:layout_gravity="center"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="24dp"
+            android:onClick="onClickDetil" />
+    </LinearLayout>
+
+</LinearLayout>

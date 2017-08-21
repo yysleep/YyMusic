@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/musicTheme"
+            app:popupTheme="@style/ToolbarPopupTheme" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/main_tabs"
+                style="@style/MusicTabLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tabStripEnabled="false"
+                app:tabTextColor="@color/whiteTwo">
+
+            </android.support.design.widget.TabLayout>
+
+        </LinearLayout>
+
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/main_music_vp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/musicTheme" />
+
+        <LinearLayout
+            android:id="@+id/main_detil_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/click_layout"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:background="@drawable/click_layout"
+                android:id="@+id/main_music_song_title_cv"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="left|center_vertical"
+                android:maxLines="1"
+                android:onClick="onClickMain"
+                android:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/main_play_iv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="12dp"
+                android:onClick="onClickMain"
+                android:src="@drawable/ic_music_stop" />
+
+            <ImageView
+                android:id="@+id/main_next_iv"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="12dp"
+                android:onClick="onClickMain"
+                android:src="@drawable/music_next" />
+
+            <com.example.administrator.yymusic.widget.CircularProgressView
+                android:id="@+id/main_music_progress_cv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="12dp"
+                android:onClick="onClickMain" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:layout_marginTop="64dp"
+        android:background="@color/colorAccent">
+
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>
+

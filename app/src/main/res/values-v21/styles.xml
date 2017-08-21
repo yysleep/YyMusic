@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="AppThene.Base">
+        <!--Navigation bar color-->
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:colorControlNormal">@color/white</item>
+    </style>
+
+</resources>
