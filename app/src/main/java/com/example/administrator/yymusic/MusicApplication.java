@@ -28,7 +28,7 @@ public class MusicApplication extends Application {
 
     public static int length;
 
-    private final String TAG = "MusicApplication";
+    private static final String TAG = "MusicApplication";
 
     @Override
     public void onCreate() {
@@ -54,7 +54,7 @@ public class MusicApplication extends Application {
          *
          * @param handler The handler to run {@link #onChange} on, or null if none.
          */
-        public MusicObserver(Handler handler) {
+        MusicObserver(Handler handler) {
             super(handler);
         }
 
