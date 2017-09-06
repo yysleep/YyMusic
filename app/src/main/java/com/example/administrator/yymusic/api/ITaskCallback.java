@@ -1,6 +1,6 @@
 package com.example.administrator.yymusic.api;
 
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 
 /**
  * Created by Administrator on 2016/5/26.

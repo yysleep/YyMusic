@@ -1,10 +1,10 @@
-package com.example.administrator.yymusic.modle;
+package com.example.administrator.yymusic.model;
 
 /**
  * Created by archermind on 17-3-30.
  * @author yysleep
  */
-public class UpdateInfo extends YMBaseModle{
+public class UpdateInfo extends YMBaseModel {
 
     private int updateFragmentNum = -1;
 

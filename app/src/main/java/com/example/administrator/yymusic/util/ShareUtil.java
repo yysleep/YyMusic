@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.example.administrator.yymusic.common.MusicConst;
-import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 

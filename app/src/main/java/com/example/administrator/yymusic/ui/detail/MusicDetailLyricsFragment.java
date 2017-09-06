@@ -1,19 +1,13 @@
 package com.example.administrator.yymusic.ui.detail;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.example.administrator.yymusic.R;
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.UpdateInfo;
-import com.example.administrator.yymusic.sys.LruCacheSys;
-import com.example.administrator.yymusic.sys.MusicPlayer;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.util.YLog;
 

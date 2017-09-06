@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.api.ITaskInterface;
 import com.example.administrator.yymusic.common.MusicConst;
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.MusicAdapter;

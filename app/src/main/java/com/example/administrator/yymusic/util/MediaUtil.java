@@ -21,7 +21,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
 import com.example.administrator.yymusic.R;
-import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
 
 /**
  * Created by Administrator on 2016/5/26.

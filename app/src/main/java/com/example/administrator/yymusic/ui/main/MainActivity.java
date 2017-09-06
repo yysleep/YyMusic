@@ -18,12 +18,11 @@ import android.support.design.widget.TabLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.service.MusicService;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;

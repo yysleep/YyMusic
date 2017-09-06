@@ -9,7 +9,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.dao.FavoriteDao;
+import com.example.administrator.yymusic.dao.MusicDBMgr;
+import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.util.YLog;
 
 import java.util.ArrayList;
@@ -166,6 +168,11 @@ public class MusicSys {
                 cursor.close();
             }
         }
+
+        List<MusicInfo> locals = MusicDBMgr.getInstance().query(FavoriteDao.TABLE_FAVORITE_MUSIC);
+        if (locals != null && locals.size() > 0)
+            collectMusics = locals;
+
     }
 
 

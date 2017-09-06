@@ -3,7 +3,6 @@ package com.example.administrator.yymusic.tool;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.administrator.yymusic.R;
-import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.util.YLog;
 

@@ -16,10 +16,8 @@ import android.widget.Toast;
 
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
-import com.example.administrator.yymusic.dao.FavoriteDao;
-import com.example.administrator.yymusic.dao.MusicDBMgr;
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;

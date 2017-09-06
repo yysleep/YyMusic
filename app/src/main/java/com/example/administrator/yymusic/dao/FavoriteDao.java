@@ -1,11 +1,15 @@
 package com.example.administrator.yymusic.dao;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.YMBaseModle;
+import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.model.YMBaseModel;
 import com.example.administrator.yymusic.util.YLog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by archermind on 17-9-6.
@@ -76,7 +80,7 @@ public class FavoriteDao extends YMBaseDao {
     }
 
     @Override
-    public void insert(SQLiteDatabase db, YMBaseModle modle) {
+    public void insert(SQLiteDatabase db, YMBaseModel modle) {
         super.insert(db, modle);
         if (modle instanceof MusicInfo) {
             MusicInfo info = (MusicInfo) modle;
@@ -98,10 +102,10 @@ public class FavoriteDao extends YMBaseDao {
     }
 
     @Override
-    public void update(SQLiteDatabase db, YMBaseModle modle) {
-        super.insert(db, modle);
-        if (modle instanceof MusicInfo) {
-            MusicInfo info = (MusicInfo) modle;
+    public void update(SQLiteDatabase db, YMBaseModel model) {
+        super.insert(db, model);
+        if (model instanceof MusicInfo) {
+            MusicInfo info = (MusicInfo) model;
             ContentValues values = new ContentValues();
             values.put(COL_IS_PLAYING, info.getIsPlaying());
             String whereClause = COL_ID + " = ? and " + COL_URL + " = ?";
@@ -111,14 +115,45 @@ public class FavoriteDao extends YMBaseDao {
     }
 
     @Override
-    public void delete(SQLiteDatabase db, YMBaseModle modle) {
-        super.delete(db, modle);
-        if (modle instanceof MusicInfo) {
-            MusicInfo info = (MusicInfo) modle;
+    public void delete(SQLiteDatabase db, YMBaseModel model) {
+        super.delete(db, model);
+        if (model instanceof MusicInfo) {
+            MusicInfo info = (MusicInfo) model;
             YLog.d(TAG, "[delete] 正在删除 id = " + info.getId() + " url = " + info.getUrl());
             db.delete(TABLE_FAVORITE_MUSIC, COL_ID + " = ? and " + COL_URL + " = ?",
                     new String[]{String.valueOf(info.getId()), info.getUrl()});
         }
     }
 
+    @Override
+    public List<MusicInfo> query(SQLiteDatabase db) {
+        if (db == null)
+            return null;
+        Cursor cursor = db.rawQuery("select * from " + TABLE_FAVORITE_MUSIC, null);
+        if (cursor == null)
+            return null;
+        List<MusicInfo> infos = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            MusicInfo info = new MusicInfo(cursor.getInt(cursor.getColumnIndex(COL_FRAGMENT)));
+            info.setId(cursor.getInt(cursor.getColumnIndex(COL_ID)));
+            if (info.getId() <= 0)
+                continue;
+            info.setTitle(cursor.getString(cursor.getColumnIndex(COL_TITLE)));
+            info.setDis_name(cursor.getString(cursor.getColumnIndex(COL_DIS_NAME)));
+            info.setAlbum(cursor.getString(cursor.getColumnIndex(COL_ALBUM)));
+            info.setMusicId(cursor.getLong(cursor.getColumnIndex(COL_MUSIC_ID)));
+            info.setAlbumId(cursor.getLong(cursor.getColumnIndex(COL_ALBUM_ID)));
+            info.setDuration(cursor.getLong(cursor.getColumnIndex(COL_DURATION)));
+            info.setSize(cursor.getLong(cursor.getColumnIndex(COL_SIZE)));
+            info.setArtist(cursor.getString(cursor.getColumnIndex(COL_ARTIST)));
+            info.setUrl(cursor.getString(cursor.getColumnIndex(COL_URL)));
+            info.setIsPlaying(cursor.getInt(cursor.getColumnIndex(COL_IS_PLAYING)));
+            infos.add(info);
+        }
+        cursor.close();
+        if (infos.size() == 0)
+            return null;
+        return infos;
+
+    }
 }

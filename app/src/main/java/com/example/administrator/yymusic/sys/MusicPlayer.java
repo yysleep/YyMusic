@@ -8,8 +8,8 @@ import com.example.administrator.yymusic.api.ITaskCallback;
 import com.example.administrator.yymusic.common.MusicConst;
 import com.example.administrator.yymusic.dao.FavoriteDao;
 import com.example.administrator.yymusic.dao.MusicDBMgr;
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.util.YLog;
 
 import java.util.HashMap;

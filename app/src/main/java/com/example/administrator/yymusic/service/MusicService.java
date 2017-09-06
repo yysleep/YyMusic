@@ -4,11 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.administrator.yymusic.api.ITaskCallback;
-import com.example.administrator.yymusic.modle.MusicInfo;
-import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.sys.NotificationSys;

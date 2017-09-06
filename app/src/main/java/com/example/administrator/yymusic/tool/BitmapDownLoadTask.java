@@ -40,7 +40,12 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
             return null;
         YLog.i(TAG, "[createAlbumArts] filePath = " + filePath);
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(filePath);
+        try {
+            retriever.setDataSource(filePath);
+        }catch (Exception e){
+            YLog.i(TAG, "[createAlbumArts] filePath = " + filePath + " 解析地址出错");
+            return null;
+        }
         byte[] bytes = retriever.getEmbeddedPicture();
         if (bytes == null) {
             return null;
