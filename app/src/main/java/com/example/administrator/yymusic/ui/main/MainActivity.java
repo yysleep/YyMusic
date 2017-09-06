@@ -29,9 +29,10 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.util.ShareUtil;
+import com.example.administrator.yymusic.util.YLog;
 import com.example.administrator.yymusic.widget.CircularProgressView;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
-import com.example.administrator.yymusic.utils.ShareUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class MainActivity extends BaseActivity {
     int progress;
     MusicPlayer instance;
     MusicHandler handler;
-    ShareUtils shareUtil;
+    ShareUtil shareUtil;
     static final int REQUEST_WRITE = 200;
     static final int REQUEST_READ = 201;
 
@@ -73,7 +74,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = MusicPlayer.getInstance();
-        shareUtil = ShareUtils.getInstance();
+        shareUtil = ShareUtil.getInstance();
         setContentView(R.layout.activity_main);
         initToolBar();
         intent = new Intent(MainActivity.this, MusicService.class);
@@ -122,7 +123,7 @@ public class MainActivity extends BaseActivity {
                 if (!msg.equals("")) {
                     Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                 }
-                ShareUtils.getInstance().savePlayModeInfo();
+                ShareUtil.getInstance().savePlayModeInfo();
                 return true;
             }
         });
@@ -171,10 +172,10 @@ public class MainActivity extends BaseActivity {
 //            }
 //        });
         String title = MusicPlayer.getInstance().getSongTitle();
-        info = ShareUtils.getInstance().getSongInfo();
+        info = ShareUtil.getInstance().getSongInfo();
 
         if (title == null && info != null) {
-            progress = ShareUtils.getInstance().getProgress();
+            progress = ShareUtil.getInstance().getProgress();
             tvSongTitle.setText(info.getTitle());
             ivPlay.setImageResource(R.drawable.ic_music_play);
             isContinue = true;
@@ -189,7 +190,7 @@ public class MainActivity extends BaseActivity {
 
         handler = new MusicHandler(this);
         new Thread(new MusicThread()).start();
-        initMode(ShareUtils.getInstance().getPlayMode());
+        initMode(ShareUtil.getInstance().getPlayMode());
 
     }
 
@@ -247,7 +248,7 @@ public class MainActivity extends BaseActivity {
                     instance.startMusic(this, MusicSys.getInstance().getPosition(0, info), 0);
                     instance.pause();
                     int musicMax = instance.getMediaPlayer().getDuration();
-                    Log.i("yymusicsssssss", "progress = " + progress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
+                    YLog.i(TAG(), "[onClickMain] progress = " + progress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
                     instance.getMediaPlayer().seekTo(musicMax * progress / 100);
                     instance.continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
@@ -401,7 +402,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG(), "[YYMusic][MainActivity] onDestroy() ");
+        YLog.i(TAG(), "[onDestroy]");
         if (!instance.isPlaying()) {
             stopService(intent);
         }
@@ -433,7 +434,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.i(TAG(), "[YYMusic][MainActivity][onRequestPermissionsResult]  requestCode = " + requestCode + " permissions = " + permissions + "  grantResults =" + grantResults);
+        YLog.i(TAG(), "[onRequestPermissionsResult]  requestCode = " + requestCode + " permissions = " + permissions + "  grantResults =" + grantResults);
         switch (requestCode) {
             case REQUEST_WRITE:
                 if (!shareUtil.getWritePermission())

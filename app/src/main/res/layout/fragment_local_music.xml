@@ -5,7 +5,7 @@
               android:orientation="vertical">
 
     <ListView
-        android:id="@+id/music_local_frgment_lv"
+        android:musicId="@+musicId/music_local_frgment_lv"
         android:layout_width="match_parent"
         android:dividerHeight="1px"
         android:divider="@color/back"
@@ -13,7 +13,7 @@
     </ListView>
 
     <TextView
-        android:id="@+id/fragment_local_collect_tv"
+        android:musicId="@+musicId/fragment_local_collect_tv"
         android:gravity="center"
         android:textColor="@color/textColor"
         android:textSize="24sp"

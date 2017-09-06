@@ -4,7 +4,7 @@ package com.example.administrator.yymusic.modle;
  * Created by archermind on 17-3-30.
  * @author yysleep
  */
-public class UpdateInfo {
+public class UpdateInfo extends YMBaseModle{
 
     private int updateFragmentNum = -1;
 
@@ -50,7 +50,7 @@ public class UpdateInfo {
 
     @Override
     public String toString() {
-        return "UpdateInfo{" +
+        return "UpdateInfo {" +
                 "updateFragmentNum=" + updateFragmentNum +
                 ", updatePosition=" + updatePosition +
                 ", updateTitle='" + updateTitle + '\'' +

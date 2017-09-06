@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.administrator.yymusic.sys.LruCacheSys;
+import com.example.administrator.yymusic.util.YLog;
 
 /**
  * Created by archermind on 17-6-8.
@@ -30,14 +31,14 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
         if (params == null)
             return;
 
-        Log.i(TAG, "[yymusic][BitmapDownLoadTask] name = " + params[0]);
+        YLog.i(TAG, "[onPostExecute] name = " + params[0]);
         LruCacheSys.getInstance().refresh(params);
     }
 
     private Bitmap createAlbumArts(String filePath) {
         if (filePath == null)
             return null;
-        Log.i(TAG, "[yymusic][createAlbumArts] filePath = " + filePath);
+        YLog.i(TAG, "[createAlbumArts] filePath = " + filePath);
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(filePath);
         byte[] bytes = retriever.getEmbeddedPicture();

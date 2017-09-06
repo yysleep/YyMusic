@@ -3,12 +3,14 @@ package com.example.administrator.yymusic.sys;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import com.example.administrator.yymusic.api.ITaskCallback;
 import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.dao.FavoriteDao;
+import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.modle.MusicInfo;
 import com.example.administrator.yymusic.modle.UpdateInfo;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +18,11 @@ import java.util.Random;
 
 /**
  * Created by Administrator on 2016/5/22.
+ *
+ * @author yysleep
  */
 public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
+    private static final String TAG = "MusicPlayer";
     public static volatile boolean isPauseByMyself;
     private static List<MusicInfo> musicInfos;
     private int mSongNum = -1;
@@ -103,7 +108,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             info.setAlbum(musicInfo.getAlbum());
 
 
-        info.setId(musicInfo.getId());
+        info.setMusicId(musicInfo.getMusicId());
         info.setDuration(musicInfo.getDuration());
         info.setSize(musicInfo.getSize());
 
@@ -117,18 +122,20 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             info.setBitmap(musicInfo.getBitmap());
 
         MusicSys.getInstance().getCollectMusics().add(info);
+        MusicDBMgr.getInstance().insert(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
         notifyObserver();
         return true;
     }
 
     public boolean removeMusicinfo(String titile) {
-        Log.i("MusicPlayer", "removeMusicinfo fragmentNum = " + mpFragmentNum + "  mSongNum = " + mSongNum);
+        YLog.i(TAG, "[removeMusicinfo] fragmentNum = " + mpFragmentNum + "  mSongNum = " + mSongNum);
         if (MusicSys.getInstance().getCollectMusics() == null || MusicSys.getInstance().getCollectMusics().size() == 0)
             return false;
 
         for (MusicInfo info : MusicSys.getInstance().getCollectMusics()) {
             if (info.getTitle().equals(titile)) {
                 MusicSys.getInstance().getCollectMusics().remove(info);
+                MusicDBMgr.getInstance().delete(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
                 return true;
             }
         }
@@ -230,7 +237,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                 });
 
             } catch (Exception e) {
-                Log.i("TAG", "异常了，老嗲");
+                YLog.i(TAG, "[startMusic] 播放异常了 e = " + e.toString());
             }
             notifyObserver();
             return;
@@ -306,7 +313,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             });
 
         } catch (Exception e) {
-            Log.i("TAG", "异常了，老嗲");
+            YLog.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
         }
     }
 
@@ -318,7 +325,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         notifyObserver();
         isFocus = false;
         isPause = true;
-        Log.i("TAG", "[yymusic][MusicPlayer][pause]");
+        YLog.i(TAG, "[pause]");
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -398,7 +405,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
 
     public long getSongId() {
         if (musicInfos != null && musicInfos.size() > 0) {
-            return musicInfos.get(mSongNum).getId();
+            return musicInfos.get(mSongNum).getMusicId();
         }
         return 0;
     }
@@ -445,7 +452,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     // 是否被收藏
     public boolean checkIsCollcet() {
         for (MusicInfo musicInfo : MusicSys.getInstance().getCollectMusics()) {
-            if (musicInfo.getTitle().equals(getSongTitle()) && musicInfo.getId() == getSongId()) {
+            if (musicInfo.getTitle().equals(getSongTitle()) && musicInfo.getMusicId() == getSongId()) {
                 return true;
             }
         }
@@ -479,7 +486,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                     mediaPlayer.start();
                     notifyObserver();
                     isPause = false;
-                    Log.i("TAG", "[yymusic][MusicPlayer][onAudioFocusChange]");
+                    YLog.i("TAG", "[onAudioFocusChange]");
                 }
                 isFocus = true;
                 break;

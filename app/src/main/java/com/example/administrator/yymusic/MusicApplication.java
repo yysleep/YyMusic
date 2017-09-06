@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.FileOperationTask;
-import com.example.administrator.yymusic.utils.ShareUtils;
+import com.example.administrator.yymusic.util.ShareUtil;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.io.File;
 
@@ -35,7 +37,7 @@ public class MusicApplication extends Application {
         super.onCreate();
 
         initStorage();
-
+        MusicDBMgr.getInstance().init(this);
         length = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth() / 2;
 
         // MusicSys.getInstance().initMusicList(getApplicationContext());
@@ -43,7 +45,7 @@ public class MusicApplication extends Application {
         // 注册观察者
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, new MusicObserver(null));
 
-        ShareUtils.getInstance().init(getApplicationContext());
+        ShareUtil.getInstance().init(getApplicationContext());
     }
 
 
@@ -63,20 +65,20 @@ public class MusicApplication extends Application {
             super.onChange(selfChange);
 
             if (FileOperationTask.isOurSelfDelete) {
-                Log.i(TAG, "第一次数据库发生了变化 为 yymusic 自身删除 ...");
+                YLog.i(TAG, "[MusicObserver][onChange] 第一次数据库发生了变化 为 yymusic 自身删除 ...");
                 FileOperationTask.isOurSelfDelete = false;
                 return;
             }
             if (FileOperationTask.autoSync) {
-                Log.i(TAG, "第二次数据库发生了变化 为 yymusic 自身删除 ...");
+                YLog.i(TAG, "[MusicObserver][onChange] 第二次数据库发生了变化 为 yymusic 自身删除 ...");
                 FileOperationTask.autoSync = false;
                 return;
             }
-            if (!ShareUtils.getInstance().getReadPermission()) {
-                Log.i(TAG, "数据库发生了变化 但是没有读取权限");
+            if (!ShareUtil.getInstance().getReadPermission()) {
+                YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 但是没有读取权限");
                 return;
             }
-            Log.i(TAG, "数据库发生了变化 正在刷新本地数据 ...");
+            YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 正在刷新本地数据 ...");
             MusicSys.getInstance().initMusicList(getApplicationContext());
             MusicPlayer.getInstance().update();
             getApplicationContext().sendBroadcast(new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST));

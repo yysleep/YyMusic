@@ -12,7 +12,8 @@ import com.example.administrator.yymusic.modle.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.sys.NotificationSys;
-import com.example.administrator.yymusic.utils.ShareUtils;
+import com.example.administrator.yymusic.util.ShareUtil;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class MusicService extends Service implements ITaskCallback {
     public void onCreate() {
         super.onCreate();
         instance=MusicPlayer.getInstance();
-        Log.i(TAG, "[YYMusic][MusicService] onCreate");
+        YLog.i(TAG, "[onCreate]");
         MusicPlayer.getInstance().registMusicObserver(TAG, this);
         musicInfos = MusicSys.getInstance().getLocalMusics();
         notificationSys = NotificationSys.getInstance();
@@ -48,11 +49,11 @@ public class MusicService extends Service implements ITaskCallback {
         if(instance.isPlaying()){
             instance.getMediaPlayer().stop();
         }
-        ShareUtils.getInstance().saveSongInfo();
+        ShareUtil.getInstance().saveSongInfo();
         notificationSys.onDestroy(this);
         MusicPlayer.getInstance().unregisMusicObserver(TAG);
         MusicPlayer.getInstance().onDestroy();
-        Log.i(TAG, "[YYMusic][MusicService] onDestroy" );
+        YLog.i(TAG, "[onDestroy]" );
         super.onDestroy();
     }
 
@@ -64,7 +65,7 @@ public class MusicService extends Service implements ITaskCallback {
         if (musicInfos != null && musicInfos.size() > 0) {
             int position = info.getUpdatePosition();
             int fragmentNum = info.getUpdateFragmentNum();
-            Log.i(TAG, "[yymusic][MusicService][getBmpSuccess] position = " + position + " fragmentNum = " + fragmentNum);
+            YLog.i(TAG, "[refreshInfo] position = " + position + " fragmentNum = " + fragmentNum);
             notificationSys.notify(info.getUpdateTitle());
         }
 

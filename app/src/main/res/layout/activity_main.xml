@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/main_toolbar"
+            android:musicId="@+musicId/main_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/musicTheme"
@@ -25,7 +25,7 @@
             android:background="@color/colorPrimary">
 
             <android.support.design.widget.TabLayout
-                android:id="@+id/main_tabs"
+                android:musicId="@+musicId/main_tabs"
                 style="@style/MusicTabLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
 
 
         <android.support.v4.view.ViewPager
-            android:id="@+id/main_music_vp"
+            android:musicId="@+musicId/main_music_vp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -50,7 +50,7 @@
             android:background="@color/musicTheme" />
 
         <LinearLayout
-            android:id="@+id/main_detil_view"
+            android:musicId="@+musicId/main_detil_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/click_layout"
@@ -60,7 +60,7 @@
 
             <TextView
                 android:background="@drawable/click_layout"
-                android:id="@+id/main_music_song_title_cv"
+                android:musicId="@+musicId/main_music_song_title_cv"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
@@ -72,7 +72,7 @@
                 android:singleLine="true" />
 
             <ImageView
-                android:id="@+id/main_play_iv"
+                android:musicId="@+musicId/main_play_iv"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
@@ -81,7 +81,7 @@
                 android:src="@drawable/ic_music_stop" />
 
             <ImageView
-                android:id="@+id/main_next_iv"
+                android:musicId="@+musicId/main_next_iv"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center"
@@ -90,7 +90,7 @@
                 android:src="@drawable/music_next" />
 
             <com.example.administrator.yymusic.widget.CircularProgressView
-                android:id="@+id/main_music_progress_cv"
+                android:musicId="@+musicId/main_music_progress_cv"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"

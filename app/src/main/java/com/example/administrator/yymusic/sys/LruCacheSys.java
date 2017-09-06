@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.administrator.yymusic.api.ITaskInterface;
 import com.example.administrator.yymusic.tool.BitmapDownLoadTask;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,7 +91,7 @@ public class LruCacheSys {
         if (task == null)
             return;
 
-        Log.i(TAG, "[yymusic][LruCacheSys][getBmpSuccess] name = " + params[0]);
+        YLog.i(TAG, "[refresh] name = " + params[0]);
         if (LruCacheSys.getInstance().getBitmapFromMemoryCache(params[1]) != null)
             task.getBmpSuccess(params[1]);
         else
@@ -99,13 +100,13 @@ public class LruCacheSys {
     }
 
     public void startTask(String name, String url) {
-        Log.i(TAG, "[yymusic][LruCacheSys][getBmpSuccess] name = " + name + " hashMap.get(name) = " + hashMap.get(name) +
+        YLog.i(TAG, "[startTask] name = " + name + " hashMap.get(name) = " + hashMap.get(name) +
                 "   getBitmapFromMemoryCache(url) = " + getBitmapFromMemoryCache(url) + "  url = " + url);
         if (name == null || hashMap.get(name) == null)
             return;
 
 
-        Log.i(TAG, "[yymusic][LruCacheSys][startTask] name = " + name + " url = " + url);
+        YLog.i(TAG, "[startTask] name = " + name + " url = " + url);
         BitmapDownLoadTask task = new BitmapDownLoadTask();
         if (taskCollection == null)
             taskCollection = new HashSet<>();

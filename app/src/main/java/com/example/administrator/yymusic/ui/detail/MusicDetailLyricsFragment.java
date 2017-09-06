@@ -15,6 +15,7 @@ import com.example.administrator.yymusic.modle.UpdateInfo;
 import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
+import com.example.administrator.yymusic.util.YLog;
 
 /**
  * Created by archermind on 17-6-9.
@@ -52,7 +53,7 @@ public class MusicDetailLyricsFragment extends BaseFragment {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
-        Log.i(TAG(), info.toString());
+        YLog.i(TAG(), "[refreshInfo]" + info.toString());
 
 
     }

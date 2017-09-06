@@ -1,17 +1,14 @@
 package com.example.administrator.yymusic.modle;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.io.Serializable;
 
 /**
  * 音乐
  * Created by Administrator on 2016/5/22.
  */
-public class MusicInfo implements Parcelable {
+public class MusicInfo extends YMBaseModle implements Parcelable {
 
     public MusicInfo(int fragmentNum) {
         this.fragmentNum = fragmentNum;
@@ -21,6 +18,8 @@ public class MusicInfo implements Parcelable {
 
     public static final int NO_PLAYING = 0;
 
+    // 本地 DB 唯一 ID
+    private int id;
 
     // 属于哪个fragment
     private int fragmentNum;
@@ -34,7 +33,7 @@ public class MusicInfo implements Parcelable {
     private String album;
 
     // 歌曲ID
-    private long id;
+    private long musicId;
 
     private long albumId;
 
@@ -54,6 +53,14 @@ public class MusicInfo implements Parcelable {
     private int isPlaying;
 
     private Bitmap bitmap;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Bitmap getBitmap() {
         return bitmap;
@@ -79,12 +86,12 @@ public class MusicInfo implements Parcelable {
         this.album = album;
     }
 
-    public long getId() {
-        return id;
+    public long getMusicId() {
+        return musicId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setMusicId(long musicId) {
+        this.musicId = musicId;
     }
 
     public long getAlbumId() {
@@ -152,15 +159,15 @@ public class MusicInfo implements Parcelable {
         this.fragmentNum = fragmentNum;
     }
 
-
     @Override
     public String toString() {
         return "MusicInfo{" +
-                "fragmentNum=" + fragmentNum +
+                "id=" + id +
+                ", fragmentNum=" + fragmentNum +
                 ", title='" + title + '\'' +
                 ", dis_name='" + dis_name + '\'' +
                 ", album='" + album + '\'' +
-                ", id=" + id +
+                ", musicId=" + musicId +
                 ", albumId=" + albumId +
                 ", duration=" + duration +
                 ", size=" + size +
@@ -182,7 +189,7 @@ public class MusicInfo implements Parcelable {
         dest.writeString(title);
         dest.writeString(dis_name);
         dest.writeString(album);
-        dest.writeLong(id);
+        dest.writeLong(musicId);
         dest.writeLong(albumId);
         dest.writeLong(duration);
         dest.writeLong(size);
@@ -210,7 +217,7 @@ public class MusicInfo implements Parcelable {
         title = source.readString();
         dis_name = source.readString();
         album = source.readString();
-        id = source.readLong();
+        musicId = source.readLong();
         albumId = source.readLong();
         duration = source.readLong();
         size = source.readLong();

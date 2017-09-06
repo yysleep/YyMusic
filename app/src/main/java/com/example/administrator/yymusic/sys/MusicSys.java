@@ -8,9 +8,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.administrator.yymusic.modle.MusicInfo;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ public class MusicSys {
             return 0;
 
         for (int i = 0; i < list.size(); i++) {
-            if (info.getId() == list.get(i).getId()) {
+            if (info.getMusicId() == list.get(i).getMusicId()) {
                 return i;
             }
         }
@@ -144,10 +144,10 @@ public class MusicSys {
                 String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
 
 
-                Log.i("yymusic", "[initMusicList]本地music 数据 path = " + path);
+                YLog.i("yymusic", "[initMusicList] 本地music 数据 path = " + path);
                 MusicInfo musicInfo = new MusicInfo(0);
                 musicInfo.setAlbum(album);
-                musicInfo.setId(id);
+                musicInfo.setMusicId(id);
                 musicInfo.setAlbumId(albumId);
                 musicInfo.setTitle(tilte);
                 musicInfo.setDuration(duration);

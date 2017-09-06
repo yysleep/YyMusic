@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="75dp"
-    android:id="@+id/item_v"
+    android:musicId="@+musicId/item_v"
     android:background="@drawable/click_item"
     android:orientation="horizontal"
     android:padding="2dp">
 
     <ImageView
-        android:id="@+id/item_song_photo_iv"
+        android:musicId="@+musicId/item_song_photo_iv"
         android:layout_width="72dp"
         android:layout_height="72dp" />
 
@@ -20,7 +20,7 @@
         android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/item_song_title_tv"
+        android:musicId="@+musicId/item_song_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -32,7 +32,7 @@
 
     <TextView
         android:layout_weight="1"
-        android:id="@+id/item_artist_tv"
+        android:musicId="@+musicId/item_artist_tv"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:ellipsize="end"

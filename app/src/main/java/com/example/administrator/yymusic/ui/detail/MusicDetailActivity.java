@@ -1,14 +1,12 @@
 package com.example.administrator.yymusic.ui.detail;
 
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,13 +16,15 @@ import android.widget.Toast;
 
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.dao.FavoriteDao;
+import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.modle.MusicInfo;
 import com.example.administrator.yymusic.modle.UpdateInfo;
-import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.util.YLog;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class MusicDetailActivity extends BaseActivity {
                             MusicPlayer.getInstance().changeFragmentNum(0);
                             for (int i = 0; i < MusicSys.getInstance().getLocalMusics().size(); i++) {
                                 MusicInfo info = MusicSys.getInstance().getLocalMusics().get(i);
-                                if (info.getTitle().equals(title) && info.getId() == id) {
+                                if (info.getTitle().equals(title) && info.getMusicId() == id) {
                                     MusicPlayer.getInstance().changeSongNum(i);
                                     break;
                                 }
@@ -270,7 +270,6 @@ public class MusicDetailActivity extends BaseActivity {
                 boolean add = MusicPlayer.getInstance().addCollectMusic();
                 if (add) {
                     ivCollect.setImageResource(R.drawable.ic_music_detilc_collected);
-
                 } else {
                     if (mDialog != null)
                         mDialog.show();
@@ -286,7 +285,7 @@ public class MusicDetailActivity extends BaseActivity {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
-        Log.i(TAG(), info.toString());
+        YLog.i(TAG(), "[refreshInfo]" + info.toString());
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null)
             tvSongTitle.setText(title);
@@ -304,12 +303,12 @@ public class MusicDetailActivity extends BaseActivity {
     }
 
 
-    static class ProgressHandler extends Handler {
+    private static class ProgressHandler extends Handler {
         int progress = 0;
         int max;
         private final WeakReference<MusicDetailActivity> detilActivity;
 
-        public ProgressHandler(MusicDetailActivity activity) {
+        private ProgressHandler(MusicDetailActivity activity) {
             detilActivity = new WeakReference<>(activity);
         }
 
@@ -336,11 +335,11 @@ public class MusicDetailActivity extends BaseActivity {
                         break;
 
                     case MusicConst.MUSIC_FAST:
-                        Log.i("yysleep", "get:" + activity.mProgress);
+                        YLog.i(activity.TAG(), "[ProgressHandler][handleMessage] mProgress : " + activity.mProgress);
                         if (activity.mProgress < 98) {
                             activity.mProgress = activity.mProgress + 3;
                         }
-                        Log.i("yysleep", "change:" + activity.mProgress);
+                        YLog.i(activity.TAG(), "[ProgressHandler][handleMessage] : " + activity.mProgress);
                         activity.tvProgressTime.setText(activity.getTime(max * activity.mProgress / 100));
                         activity.seekBar.setProgress(activity.mProgress);
 
@@ -357,7 +356,7 @@ public class MusicDetailActivity extends BaseActivity {
         }
     }
 
-    class MusicRunnable implements Runnable {
+    private class MusicRunnable implements Runnable {
 
         @Override
         public void run() {
@@ -381,7 +380,7 @@ public class MusicDetailActivity extends BaseActivity {
         // 得到该首歌曲最长秒数
         int musicMax = MusicPlayer.getInstance().getMediaPlayer().getDuration();
         int seekBarMax = seekBar.getMax();
-        Log.i("yymusic", "progress = " + progress + " ---  seekBarMax= " + seekBarMax + " ---  musicMax= " + musicMax);
+        YLog.i(TAG(), "[moveSeekbar] progress = " + progress + " ---  seekBarMax= " + seekBarMax + " ---  musicMax= " + musicMax);
         // 跳到该曲该秒
         MusicPlayer.getInstance().getMediaPlayer().seekTo(musicMax * progress / seekBarMax);
 

@@ -28,7 +28,8 @@ import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.FileOperationTask;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
-import com.example.administrator.yymusic.utils.ShareUtils;
+import com.example.administrator.yymusic.util.ShareUtil;
+import com.example.administrator.yymusic.util.YLog;
 
 /**
  * Created by Administrator on 2016/5/25.
@@ -147,7 +148,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
             return;
         }
 
-        Log.i(TAG(), info.toString());
+        YLog.i(TAG(), "[refreshInfo]" + info.toString());
         // 判断是否有歌曲显示为播放状态
         boolean isUpdate = false;
         if (info.getUpdateFragmentNum() != 0) {
@@ -190,12 +191,12 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (!ShareUtils.getInstance().getWritePermission()) {
+                        if (!ShareUtil.getInstance().getWritePermission()) {
                             Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除，请去设置界面开启相应的权限", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        Log.d(TAG(), "[YyMusic][MusicLocalFragment][onItemLongClick] info = " + mInfo);
+                        YLog.d(TAG(), "[showAlert] info = " + mInfo);
                         if (mInfo.getIsPlaying() == 1) {
                             Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除正在播放的歌曲", Toast.LENGTH_SHORT).show();
                             return;
@@ -224,7 +225,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
             musicApapter.musicInfos.remove(mInfo);
             if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_LOCAL) {
                 MusicPlayer.getInstance().refreshList(mPosition);
-                Log.d(TAG(), "refreshDeleteFile 当前列表为 本地列表");
+                YLog.d(TAG(), "[refreshDeleteFile] 当前列表为 本地列表");
             }
             musicApapter.notifyDataSetChanged();
             callback.syncList(path);

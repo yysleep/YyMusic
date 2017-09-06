@@ -9,6 +9,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.example.administrator.yymusic.R;
+import com.example.administrator.yymusic.util.YLog;
 
 /**
  * Created by archermind on 17-2-14.
@@ -100,7 +101,7 @@ public class NotificationSys {
         boolean bIsLargerThanO80 = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             bIsLargerThanO80 = true;
-        Log.d(LOG_TAG, "largerThanO80 = " + bIsLargerThanO80);
+        YLog.d(LOG_TAG, "[largerThanO80] = " + bIsLargerThanO80);
         return bIsLargerThanO80;
     }
 
