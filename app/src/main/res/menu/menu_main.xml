@@ -5,21 +5,21 @@
     tools:context=".ui.main.MainActivity">
 
     <item
-        android:musicId="@+musicId/main_tool_menu_item_one"
+        android:id="@+id/main_tool_menu_item_one"
         android:title="单曲循环"
         android:orderInCategory="80"
         android:icon="@drawable/ic_music_new_last"
         app:showAsAction="never" />
 
     <item
-        android:musicId="@+musicId/main_tool_menu_item_two"
+        android:id="@+id/main_tool_menu_item_two"
         android:title="全部循环"
         android:orderInCategory="80"
         android:icon="@drawable/ic_music_play"
         app:showAsAction="never"/>
 
     <item
-        android:musicId="@+musicId/main_tool_menu_item_three"
+        android:id="@+id/main_tool_menu_item_three"
         android:title="随机播放"
         android:orderInCategory="80"
         android:icon="@drawable/ic_music_new_next"

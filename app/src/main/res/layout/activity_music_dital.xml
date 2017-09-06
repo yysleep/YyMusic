@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:musicId="@+musicId/music_detil_song_title_tv"
+        android:id="@+id/music_detil_song_title_tv"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="@color/musicTheme"
@@ -20,7 +20,7 @@
         android:textSize="24sp" />
 
 <android.support.v4.view.ViewPager
-    android:musicId="@+musicId/music_detail_vp"
+    android:id="@+id/music_detail_vp"
     android:layout_weight="1"
     android:layout_width="match_parent"
     android:layout_height="0dp">
@@ -36,7 +36,7 @@
 
         <TextView
             android:textColor="@color/colorAccent"
-            android:musicId="@+musicId/music_detil_progress_time_tv"
+            android:id="@+id/music_detil_progress_time_tv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -45,7 +45,7 @@
             android:visibility="visible" />
 
         <SeekBar
-            android:musicId="@+musicId/music_detil_progress_sk"
+            android:id="@+id/music_detil_progress_sk"
             style="@style/YMSeekbarStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
 
         <TextView
             android:textColor="@color/colorAccent"
-            android:musicId="@+musicId/music_detil_alltime_tv"
+            android:id="@+id/music_detil_alltime_tv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -71,7 +71,7 @@
 
         <ImageView
             android:layout_gravity="center"
-            android:musicId="@+musicId/music_detil_collect_iv"
+            android:id="@+id/music_detil_collect_iv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginRight="24dp"
@@ -79,7 +79,7 @@
             android:src="@drawable/ic_music_new_collect" />
 
         <ImageView
-            android:musicId="@+musicId/music_detil_last_tv"
+            android:id="@+id/music_detil_last_tv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
@@ -88,7 +88,7 @@
             android:src="@drawable/music_last" />
 
         <ImageView
-            android:musicId="@+musicId/music_detil_play_tv"
+            android:id="@+id/music_detil_play_tv"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="center"
@@ -96,7 +96,7 @@
             android:src="@drawable/ic_music_stop" />
 
         <ImageView
-            android:musicId="@+musicId/music_detil_next_tv"
+            android:id="@+id/music_detil_next_tv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
