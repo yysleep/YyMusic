@@ -3,11 +3,13 @@ package com.example.administrator.yymusic.ui.main;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -82,6 +84,9 @@ public class MainActivity extends BaseActivity {
         startService(intent);
         init();
         isOutSide = true;
+
+        // int writePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        // int readPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (shareUtil.getWritePermission()) {
             type = WRITE_P;
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
@@ -466,6 +471,7 @@ public class MainActivity extends BaseActivity {
 
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                // Toast.makeText(this, "请前往设置界面打开相应权限", Toast.LENGTH_LONG).show();
                 break;
         }
     }

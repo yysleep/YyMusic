@@ -174,6 +174,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
                             return;
                         }
                         musicApapter.musicInfos.remove(info);
+                        MusicDBMgr.getInstance().delete(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
                         if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_COLLECT) {
                             MusicPlayer.getInstance().refreshList(mPosition);
                             YLog.d(TAG(), "[showAlert] 当前列表为 收藏列表");
