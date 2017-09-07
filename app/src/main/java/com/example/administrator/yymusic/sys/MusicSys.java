@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import com.example.administrator.yymusic.dao.FavoriteDao;
 import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.model.MusicInfo;
+import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 
 import java.util.ArrayList;
@@ -56,8 +57,6 @@ public class MusicSys {
 
     // 本地音乐列表
     public List<MusicInfo> getCollectMusics() {
-        if (collectMusics == null)
-            return localMusics;
         return collectMusics;
     }
 
@@ -94,13 +93,15 @@ public class MusicSys {
 
 
     // 初始化数据库所有音乐
-    public synchronized void initMusicList(Context context) {
+    public synchronized void initMusicList(Context context, boolean firstInit, boolean outsideInit) {
         String url = null;
+        MusicInfo info = ShareUtil.getInstance().getSongInfo();
         if (localMusics != null) {
-            if (localMusics.size() > 0 && MusicPlayer.getInstance().isStarted()) {
-                MusicInfo info = MusicPlayer.getInstance().getSongInfo();
-                if (info != null)
-                    url = info.getUrl();
+            if (outsideInit && localMusics.size() > 0 && MusicPlayer.getInstance().isStarted()) {
+                MusicInfo i = MusicPlayer.getInstance().getSongInfo();
+                if (i != null)
+                    url = i.getUrl();
+                i = null;
             }
 
             localMusics = null;
@@ -145,8 +146,6 @@ public class MusicSys {
                 // 歌曲文件的路径 ：MediaStore.Audio.Media.DATA
                 String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
 
-
-                YLog.i("yymusic", "[initMusicList] 本地music 数据 path = " + path);
                 MusicInfo musicInfo = new MusicInfo(0);
                 musicInfo.setAlbum(album);
                 musicInfo.setMusicId(id);
@@ -158,9 +157,18 @@ public class MusicSys {
                 musicInfo.setUrl(path);
                 musicInfo.setDis_name(dis_name);
 
-                if (url != null && MusicPlayer.getInstance().getFragmentNum() == 0 && url.equals(path))
+                if (outsideInit && url != null && MusicPlayer.getInstance().getFragmentNum() == 0 && url.equals(path)) {
                     musicInfo.setIsPlaying(MusicInfo.IS_PLAYING);
-
+                    MusicPlayer.getInstance().changeFragmentNum(0);
+                    outsideInit = false;
+                    firstInit = false;
+                } else if (firstInit && info != null && info.getFragmentNum() == 0 && info.getUrl().equals(path)) {
+                    musicInfo.setIsPlaying(MusicInfo.IS_PLAYING);
+                    MusicPlayer.getInstance().changeFragmentNum(0);
+                    firstInit = false;
+                    outsideInit = false;
+                }
+                YLog.i("yymusic", "[initMusicList] 本地music 数据 musicInfo = " + musicInfo);
                 localMusics.add(musicInfo);
             } while (cursor.moveToNext());
         } finally {
@@ -169,7 +177,7 @@ public class MusicSys {
             }
         }
 
-        List<MusicInfo> locals = MusicDBMgr.getInstance().query(FavoriteDao.TABLE_FAVORITE_MUSIC);
+        List<MusicInfo> locals = MusicDBMgr.getInstance().query(FavoriteDao.TABLE_FAVORITE_MUSIC, firstInit, outsideInit);
         if (locals != null && locals.size() > 0)
             collectMusics = locals;
 

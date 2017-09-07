@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class ShareUtil {
 
-    private static final String  TAG = "ShareUtil";
+    private static final String TAG = "ShareUtil";
 
     private ShareUtil() {
 
@@ -63,7 +63,9 @@ public class ShareUtil {
         int currentPosition = instance.getMediaPlayer().getCurrentPosition();
         int max = instance.getMediaPlayer().getDuration();
         int progress = (int) ((float) currentPosition * 100 / max);
+        int fragment = instance.getFragmentNum();
         editor.putString(MusicConst.SONG_TITLE, titile);
+        editor.putInt(MusicConst.SONG_FRAGMENT, fragment);
         editor.putLong(MusicConst.SONG_ID, id);
         editor.putInt(MusicConst.PROGRESS, progress);
 
@@ -105,15 +107,15 @@ public class ShareUtil {
 
         String title = sp.getString(MusicConst.SONG_TITLE, null);
         Long id = sp.getLong(MusicConst.SONG_ID, 0);
+        int fragment = sp.getInt(MusicConst.SONG_FRAGMENT, 0);
         for (MusicInfo info : list) {
             if (title == null)
                 continue;
 
 
             if (title.equals(info.getTitle()) && id == info.getMusicId()) {
-
+                info.setFragmentNum(fragment);
                 return info;
-
             }
         }
         return null;

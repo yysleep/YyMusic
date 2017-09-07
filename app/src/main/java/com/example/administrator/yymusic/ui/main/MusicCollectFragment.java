@@ -1,6 +1,10 @@
 package com.example.administrator.yymusic.ui.main;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +19,8 @@ import android.widget.Toast;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.api.ITaskInterface;
 import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.dao.FavoriteDao;
+import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
@@ -36,6 +42,23 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     TextView tvCollect;
     private int mPosition;
 
+    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST)) {
+                if (musicApapter == null)
+                    return;
+                musicApapter.musicInfos = MusicSys.getInstance().getCollectMusics();
+                if (musicApapter.musicInfos.size() > 0 && lvMusic != null && tvCollect != null) {
+                    lvMusic.setVisibility(View.VISIBLE);
+                    tvCollect.setVisibility(View.GONE);
+                }
+                musicApapter.setOutsideChange(true);
+                musicApapter.notifyDataSetChanged();
+            }
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,12 +66,15 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
             view = inflater.inflate(R.layout.fragment_local_music, container, false);
         }
         initView();
+        YLog.d(TAG(), "[onCreateView] ");
         return view;
     }
 
     public void initView() {
         lvMusic = (ListView) view.findViewById(R.id.music_local_frgment_lv);
         tvCollect = (TextView) view.findViewById(R.id.fragment_local_collect_tv);
+        IntentFilter intentFilter = new IntentFilter(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+        getActivity().registerReceiver(updateReceiver, intentFilter);
         musicApapter = new MusicAdapter(getActivity(), MusicSys.getInstance().getCollectMusics(), lvMusic, TAG());
         if (MusicSys.getInstance().getCollectMusics().size() <= 0) {
             lvMusic.setVisibility(View.GONE);
@@ -88,6 +114,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     @Override
     public void onDestroy() {
         super.onDestroy();
+        getActivity().unregisterReceiver(updateReceiver);
     }
 
     @Override
@@ -185,6 +212,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
         }
         if (info != null) {
             musicApapter.musicInfos.remove(info);
+            MusicDBMgr.getInstance().delete(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
             if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_COLLECT) {
                 MusicPlayer.getInstance().refreshList(mPosition);
                 YLog.d(TAG(), "[syncList] 当前列表为 收藏列表");

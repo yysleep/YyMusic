@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.YMBaseModel;
+import com.example.administrator.yymusic.sys.MusicPlayer;
+import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 
 import java.util.ArrayList;
@@ -86,16 +88,16 @@ public class FavoriteDao extends YMBaseDao {
             MusicInfo info = (MusicInfo) modle;
             ContentValues values = new ContentValues();
             values.put(COL_FRAGMENT, info.getFragmentNum());
-            values.put(COL_TITLE, info.getFragmentNum());
-            values.put(COL_DIS_NAME, info.getFragmentNum());
-            values.put(COL_ALBUM, info.getFragmentNum());
-            values.put(COL_MUSIC_ID, info.getFragmentNum());
-            values.put(COL_ALBUM_ID, info.getFragmentNum());
-            values.put(COL_DURATION, info.getFragmentNum());
-            values.put(COL_SIZE, info.getFragmentNum());
-            values.put(COL_ARTIST, info.getFragmentNum());
-            values.put(COL_URL, info.getFragmentNum());
-            values.put(COL_IS_PLAYING, info.getFragmentNum());
+            values.put(COL_TITLE, info.getTitle());
+            values.put(COL_DIS_NAME, info.getDis_name());
+            values.put(COL_ALBUM, info.getAlbum());
+            values.put(COL_MUSIC_ID, info.getMusicId());
+            values.put(COL_ALBUM_ID, info.getAlbumId());
+            values.put(COL_DURATION, info.getDuration());
+            values.put(COL_SIZE, info.getSize());
+            values.put(COL_ARTIST, info.getArtist());
+            values.put(COL_URL, info.getUrl());
+            values.put(COL_IS_PLAYING, info.getIsPlaying());
 
             db.insert(TABLE_FAVORITE_MUSIC, null, values);
         }
@@ -119,36 +121,59 @@ public class FavoriteDao extends YMBaseDao {
         super.delete(db, model);
         if (model instanceof MusicInfo) {
             MusicInfo info = (MusicInfo) model;
-            YLog.d(TAG, "[delete] 正在删除 id = " + info.getId() + " url = " + info.getUrl());
-            db.delete(TABLE_FAVORITE_MUSIC, COL_ID + " = ? and " + COL_URL + " = ?",
-                    new String[]{String.valueOf(info.getId()), info.getUrl()});
+            YLog.d(TAG, "[delete] 正在删除 title = " + info.getTitle() + " url = " + info.getUrl());
+            db.delete(TABLE_FAVORITE_MUSIC, COL_TITLE + " = ? and " + COL_URL + " = ?",
+                    new String[]{info.getTitle(), info.getUrl()});
         }
     }
 
     @Override
-    public List<MusicInfo> query(SQLiteDatabase db) {
+    public List<MusicInfo> query(SQLiteDatabase db, boolean firstInit, boolean outside) {
         if (db == null)
             return null;
         Cursor cursor = db.rawQuery("select * from " + TABLE_FAVORITE_MUSIC, null);
         if (cursor == null)
             return null;
+
+        String url = null;
+        MusicInfo info = ShareUtil.getInstance().getSongInfo();
+        if (outside && MusicPlayer.getInstance().isStarted()) {
+            MusicInfo i = MusicPlayer.getInstance().getSongInfo();
+            if (i != null)
+                url = i.getUrl();
+            i = null;
+        }
+
         List<MusicInfo> infos = new ArrayList<>();
         while (cursor.moveToNext()) {
-            MusicInfo info = new MusicInfo(cursor.getInt(cursor.getColumnIndex(COL_FRAGMENT)));
-            info.setId(cursor.getInt(cursor.getColumnIndex(COL_ID)));
-            if (info.getId() <= 0)
+            MusicInfo i = new MusicInfo(cursor.getInt(cursor.getColumnIndex(COL_FRAGMENT)));
+            i.setId(cursor.getInt(cursor.getColumnIndex(COL_ID)));
+            if (i.getId() <= 0)
                 continue;
-            info.setTitle(cursor.getString(cursor.getColumnIndex(COL_TITLE)));
-            info.setDis_name(cursor.getString(cursor.getColumnIndex(COL_DIS_NAME)));
-            info.setAlbum(cursor.getString(cursor.getColumnIndex(COL_ALBUM)));
-            info.setMusicId(cursor.getLong(cursor.getColumnIndex(COL_MUSIC_ID)));
-            info.setAlbumId(cursor.getLong(cursor.getColumnIndex(COL_ALBUM_ID)));
-            info.setDuration(cursor.getLong(cursor.getColumnIndex(COL_DURATION)));
-            info.setSize(cursor.getLong(cursor.getColumnIndex(COL_SIZE)));
-            info.setArtist(cursor.getString(cursor.getColumnIndex(COL_ARTIST)));
-            info.setUrl(cursor.getString(cursor.getColumnIndex(COL_URL)));
-            info.setIsPlaying(cursor.getInt(cursor.getColumnIndex(COL_IS_PLAYING)));
-            infos.add(info);
+            i.setTitle(cursor.getString(cursor.getColumnIndex(COL_TITLE)));
+            i.setDis_name(cursor.getString(cursor.getColumnIndex(COL_DIS_NAME)));
+            i.setAlbum(cursor.getString(cursor.getColumnIndex(COL_ALBUM)));
+            i.setMusicId(cursor.getLong(cursor.getColumnIndex(COL_MUSIC_ID)));
+            i.setAlbumId(cursor.getLong(cursor.getColumnIndex(COL_ALBUM_ID)));
+            i.setDuration(cursor.getLong(cursor.getColumnIndex(COL_DURATION)));
+            i.setSize(cursor.getLong(cursor.getColumnIndex(COL_SIZE)));
+            i.setArtist(cursor.getString(cursor.getColumnIndex(COL_ARTIST)));
+            String path = cursor.getString(cursor.getColumnIndex(COL_URL));
+            i.setUrl(path);
+            i.setIsPlaying(cursor.getInt(cursor.getColumnIndex(COL_IS_PLAYING)));
+            if (outside && url != null && MusicPlayer.getInstance().getFragmentNum() == 1 && url.equals(path)) {
+                i.setIsPlaying(MusicInfo.IS_PLAYING);
+                MusicPlayer.getInstance().changeFragmentNum(1);
+                firstInit = false;
+                outside = false;
+            } else if (firstInit && info != null && info.getFragmentNum() == 1 && info.getUrl().equals(path)) {
+                i.setIsPlaying(MusicInfo.IS_PLAYING);
+                MusicPlayer.getInstance().changeFragmentNum(1);
+                outside = false;
+                firstInit = false;
+            }
+            YLog.d(TAG, " [query] db info = " + i.toString());
+            infos.add(i);
         }
         cursor.close();
         if (infos.size() == 0)

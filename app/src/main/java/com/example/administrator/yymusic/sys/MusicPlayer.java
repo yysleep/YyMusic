@@ -185,7 +185,6 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         for (int i = 0; i < musicInfos.size(); i++) {
             if (musicInfos.get(i).getUrl().equals(path)) {
                 mSongNum = i;
-                musicInfos.get(i).setIsPlaying(MusicInfo.IS_PLAYING);
                 return;
             }
         }

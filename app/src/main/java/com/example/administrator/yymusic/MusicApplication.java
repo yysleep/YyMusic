@@ -79,9 +79,11 @@ public class MusicApplication extends Application {
                 return;
             }
             YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 正在刷新本地数据 ...");
-            MusicSys.getInstance().initMusicList(getApplicationContext());
+            MusicSys.getInstance().initMusicList(getApplicationContext(), false, true);
             MusicPlayer.getInstance().update();
-            getApplicationContext().sendBroadcast(new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST));
+            Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+            intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, true);
+            getApplicationContext().sendBroadcast(intent);
         }
     }
 

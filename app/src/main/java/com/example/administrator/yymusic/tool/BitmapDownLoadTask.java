@@ -11,6 +11,7 @@ import com.example.administrator.yymusic.util.YLog;
 
 /**
  * Created by archermind on 17-6-8.
+ *
  * @author yysleep
  */
 public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
@@ -42,7 +43,7 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         try {
             retriever.setDataSource(filePath);
-        }catch (Exception e){
+        } catch (Exception e) {
             YLog.i(TAG, "[createAlbumArts] filePath = " + filePath + " 解析地址出错");
             return null;
         }

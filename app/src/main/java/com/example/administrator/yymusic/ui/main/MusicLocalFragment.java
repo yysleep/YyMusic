@@ -171,7 +171,8 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                 musicInfo.setIsPlaying(0);
             }
         }
-        musicApapter.musicInfos.get(info.getUpdatePosition()).setIsPlaying(MusicConst.PLAYING);
+        YLog.i(TAG(), "[refreshInfo] setIsPlaying 1");
+        musicApapter.musicInfos.get(info.getUpdatePosition()).setIsPlaying(MusicInfo.IS_PLAYING);
         musicApapter.notifyDataSetChanged();
 
     }

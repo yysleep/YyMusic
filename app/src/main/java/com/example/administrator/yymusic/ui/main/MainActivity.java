@@ -48,13 +48,15 @@ public class MainActivity extends BaseActivity {
     public boolean isOutSide;
     Intent intent;
     Boolean isContinue;
-    MusicInfo info;
-    int progress;
+    MusicInfo mInfo;
+    int mProgress;
     MusicPlayer instance;
     MusicHandler handler;
     ShareUtil shareUtil;
     static final int REQUEST_WRITE = 200;
     static final int REQUEST_READ = 201;
+
+    static final int FRIST_INIT = 1000;
 
     private static final int NONE_P = 0;
     private static final int WRITE_P = 1;
@@ -82,10 +84,10 @@ public class MainActivity extends BaseActivity {
         isOutSide = true;
         if (shareUtil.getWritePermission()) {
             type = WRITE_P;
-             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
         }
         if (shareUtil.getReadPermission()) {
-             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
             if (type == WRITE_P)
                 type = BOTH_P;
             else
@@ -170,22 +172,6 @@ public class MainActivity extends BaseActivity {
 //                }
 //            }
 //        });
-        String title = MusicPlayer.getInstance().getSongTitle();
-        info = ShareUtil.getInstance().getSongInfo();
-
-        if (title == null && info != null) {
-            progress = ShareUtil.getInstance().getProgress();
-            tvSongTitle.setText(info.getTitle());
-            ivPlay.setImageResource(R.drawable.ic_music_play);
-            isContinue = true;
-            info.setIsPlaying(1);
-
-        } else {
-            progress = 0;
-            isContinue = false;
-            tvSongTitle.setText("快去听歌吧");
-        }
-        cpProgress.setProgress(progress);
 
         handler = new MusicHandler(this);
         new Thread(new MusicThread()).start();
@@ -232,7 +218,10 @@ public class MainActivity extends BaseActivity {
             ivPlay.setImageResource(R.drawable.ic_music_stop);
             if (instance.getSongInfo() != null && instance.getSongTitle() != null)
                 tvSongTitle.setText(instance.getSongTitle());
+        }
 
+        if (instance.getSongInfo() != null) {
+            isContinue = false;
         }
     }
 
@@ -240,15 +229,12 @@ public class MainActivity extends BaseActivity {
 
         switch (v.getId()) {
             case R.id.main_play_iv:
-                if (instance.getSongInfo() != null) {
-                    isContinue = false;
-                }
-                if (isContinue && info != null) {
-                    instance.startMusic(this, MusicSys.getInstance().getPosition(0, info), 0);
+                if (isContinue && mInfo != null) {
+                    instance.startMusic(this, MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
                     instance.pause();
                     int musicMax = instance.getMediaPlayer().getDuration();
-                    YLog.i(TAG(), "[onClickMain] progress = " + progress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
-                    instance.getMediaPlayer().seekTo(musicMax * progress / 100);
+                    YLog.i(TAG(), "[onClickMain] mProgress = " + mProgress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
+                    instance.getMediaPlayer().seekTo(musicMax * mProgress / 100);
                     instance.continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
                     isContinue = false;
@@ -266,6 +252,12 @@ public class MainActivity extends BaseActivity {
                 }
                 break;
             case R.id.main_next_iv:
+                if (isContinue && mInfo != null) {
+                    instance.startMusic(this, MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
+                    instance.nextMusic();
+                    isContinue = false;
+                    break;
+                }
                 if (!instance.isStarted()) {
                     startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
                     break;
@@ -331,6 +323,21 @@ public class MainActivity extends BaseActivity {
                         int max = MusicPlayer.getInstance().getMediaPlayer().getDuration();
                         int progress = (int) ((float) currentPosition * 100 / max);
                         activity.cpProgress.setProgress(progress);
+                        break;
+                    case FRIST_INIT:
+                        activity.mInfo = ShareUtil.getInstance().getSongInfo();
+                        YLog.d(activity.TAG(), "[init] info = " + activity.mInfo);
+                        if (activity.mInfo != null) {
+                            activity.mProgress = ShareUtil.getInstance().getProgress();
+                            activity.tvSongTitle.setText(activity.mInfo.getTitle());
+                            activity.ivPlay.setImageResource(R.drawable.ic_music_play);
+                            activity.isContinue = true;
+                        } else {
+                            activity.mProgress = 0;
+                            activity.isContinue = false;
+                            activity.tvSongTitle.setText("快去听歌吧");
+                        }
+                        activity.cpProgress.setProgress(activity.mProgress);
                         break;
                     default:
                         break;
@@ -424,7 +431,7 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this,"权限未获取到，请用户进入设置手动获取",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "权限未获取到，请用户进入设置手动获取", Toast.LENGTH_LONG).show();
                     }
                 }).
                 create();
@@ -444,9 +451,14 @@ public class MainActivity extends BaseActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        MusicSys.getInstance().initMusicList(getApplicationContext());
+                        MusicSys.getInstance().initMusicList(getApplicationContext(), true, false);
                         MusicPlayer.getInstance().update();
-                        getApplicationContext().sendBroadcast(new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST));
+                        Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+                        intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
+                        getApplicationContext().sendBroadcast(intent);
+                        Message msg = Message.obtain();
+                        msg.what = FRIST_INIT;
+                        handler.sendMessage(msg);
                     }
                 }).start();
                 if (!shareUtil.getReadPermission())

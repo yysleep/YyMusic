@@ -130,7 +130,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         mFristVisibleItem = firstVisibleItem;
         mVisibleCount = visibleItemCount;
-        YLog.i(TAG, "[onScroll] firstVisibleItem = " + firstVisibleItem + " visibleItemCount = " + visibleItemCount);
+        // YLog.i(TAG, "[onScroll] firstVisibleItem = " + firstVisibleItem + " visibleItemCount = " + visibleItemCount);
         if (isFristEnter && mVisibleCount != 0) {
             startTask();
             isFristEnter = false;

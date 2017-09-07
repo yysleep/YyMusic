@@ -96,13 +96,13 @@ public class MusicDBMgr<T extends YMBaseModel> {
         }
     }
 
-    public List<MusicInfo> query(String table) {
+    public List<MusicInfo> query(String table, boolean firstInit, boolean outside) {
         List<MusicInfo> models = null;
         if (table == null)
             return null;
         switch (table) {
             case FavoriteDao.TABLE_FAVORITE_MUSIC:
-                models = FavoriteDao.getInstance().query(mDbInstance);
+                models = FavoriteDao.getInstance().query(mDbInstance, firstInit, outside);
                 break;
         }
         return models;

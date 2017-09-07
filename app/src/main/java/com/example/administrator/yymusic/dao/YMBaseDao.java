@@ -37,5 +37,5 @@ public abstract class YMBaseDao<T extends YMBaseModel> {
         YLog.i(TAG, "[delete] 数据库删除了数据");
     }
 
-    public abstract List<T> query(SQLiteDatabase db);
+    public abstract List<T> query(SQLiteDatabase db, boolean firstInit, boolean outside);
 }

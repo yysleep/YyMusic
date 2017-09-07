@@ -39,4 +39,8 @@ public class MusicConst {
     public final static String PROGRESS = "com.example.administrator.yymusic.progress";
 
     public final static String SONG_ID = "com.example.administrator.yymusic.id";
+
+    public final static String SONG_FRAGMENT = "com.example.administrator.yymusic.fragment";
+
+    public final static String CHANGE_FROM_OUTSIDE = "com.example.administrator.yymusic.change.outside";
 }
