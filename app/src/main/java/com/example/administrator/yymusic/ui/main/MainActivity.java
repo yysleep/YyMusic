@@ -30,6 +30,7 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.util.YYConstant;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 import com.example.administrator.yymusic.widget.CircularProgressView;
@@ -44,7 +45,6 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
     private TextView tvSongTitle;
     private CircularProgressView cpProgress;
-    ;
     private ImageView ivPlay;
     //    private ImageView ivPlayMode;
     public boolean isOutSide;
@@ -59,14 +59,6 @@ public class MainActivity extends BaseActivity {
     static final int REQUEST_READ = 201;
 
     static final int FRIST_INIT = 1000;
-
-    private static final int NONE_P = 0;
-    private static final int WRITE_P = 1;
-    private static final int READ_P = 2;
-    private static final int BOTH_P = 3;
-
-    int type = NONE_P;
-
 
     @Override
     public String TAG() {
@@ -84,23 +76,29 @@ public class MainActivity extends BaseActivity {
         startService(intent);
         init();
         isOutSide = true;
+        checkPermission();
+    }
 
-        // int writePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        // int readPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (shareUtil.getWritePermission()) {
-            type = WRITE_P;
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
-        }
-        if (shareUtil.getReadPermission()) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
-            if (type == WRITE_P)
-                type = BOTH_P;
-            else
-                type = READ_P;
-        }
-        if (type != BOTH_P)
-            showAlert();
 
+    public void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            YLog.d(TAG(), "[checkPermission] 已经拥有读取权限");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MusicSys.getInstance().initMusicList(getApplicationContext(), true, false);
+                    MusicPlayer.getInstance().update();
+                    Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+                    intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
+                    getApplicationContext().sendBroadcast(intent);
+                    Message msg = Message.obtain();
+                    msg.what = FRIST_INIT;
+                    handler.sendMessage(msg);
+                }
+            }).start();
+        } else {
+            showAlert(YYConstant.READ_PERMISSION);
+        }
     }
 
     void initToolBar() {
@@ -177,20 +175,16 @@ public class MainActivity extends BaseActivity {
 //                }
 //            }
 //        });
-
         handler = new MusicHandler(this);
         new Thread(new MusicThread()).start();
         initMode(ShareUtil.getInstance().getPlayMode());
-
     }
 
     private List<Fragment> getFragments() {
         List<Fragment> fragments = new ArrayList<>();
-
         MusicDiscoverFragment fragment3 = new MusicDiscoverFragment();
         MusicCollectFragment fragment2 = new MusicCollectFragment();
         MusicLocalFragment fragment1 = new MusicLocalFragment(fragment2);
-
 
         fragments.add(fragment1);
         fragments.add(fragment2);
@@ -419,7 +413,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void showAlert() {
+    public void showAlert(final int type) {
         AlertDialog alertDialog = new AlertDialog.Builder(this).
                 setTitle("权限说明").
                 setMessage("开启访问音频文件的权限").
@@ -428,8 +422,21 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
+                        switch (type) {
+                            case YYConstant.READ_PERMISSION:
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
+                                YLog.d(TAG(), "[showAlert] 正在申请读取权限");
+                                break;
+
+                            case YYConstant.WRITE_PERMISSON:
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
+                                YLog.d(TAG(), "[showAlert] 正在申请删除权限");
+                                break;
+
+                            default:
+                                break;
+                        }
+
                     }
                 }).
                 setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -447,31 +454,39 @@ public class MainActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         YLog.i(TAG(), "[onRequestPermissionsResult]  requestCode = " + requestCode + " permissions = " + permissions + "  grantResults =" + grantResults);
         switch (requestCode) {
-            case REQUEST_WRITE:
-                if (!shareUtil.getWritePermission())
-                    shareUtil.saveWritePermission();
-                break;
-
             case REQUEST_READ:
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MusicSys.getInstance().initMusicList(getApplicationContext(), true, false);
-                        MusicPlayer.getInstance().update();
-                        Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
-                        intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
-                        getApplicationContext().sendBroadcast(intent);
-                        Message msg = Message.obtain();
-                        msg.what = FRIST_INIT;
-                        handler.sendMessage(msg);
-                    }
-                }).start();
-                if (!shareUtil.getReadPermission())
-                    shareUtil.saveReadPermission();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 已经拥有读取权限");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MusicSys.getInstance().initMusicList(getApplicationContext(), true, false);
+                            MusicPlayer.getInstance().update();
+                            Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
+                            intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
+                            getApplicationContext().sendBroadcast(intent);
+                            Message msg = Message.obtain();
+                            msg.what = FRIST_INIT;
+                            handler.sendMessage(msg);
+                        }
+                    }).start();
+                } else {
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 获取读取权限失败");
+                    Toast.makeText(MainActivity.this, "获取读取权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
+                }
 
+            case REQUEST_WRITE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 已经拥有删除权限");
+                    Toast.makeText(MainActivity.this, "已获得删除权限，可以开始删除", Toast.LENGTH_LONG).show();
+                } else {
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 获取删除权限失败");
+                    Toast.makeText(MainActivity.this, "获取删除权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
+
+                }
+                break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                // Toast.makeText(this, "请前往设置界面打开相应权限", Toast.LENGTH_LONG).show();
                 break;
         }
     }

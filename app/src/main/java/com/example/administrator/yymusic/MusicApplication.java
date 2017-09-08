@@ -1,12 +1,15 @@
 package com.example.administrator.yymusic;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -74,7 +77,7 @@ public class MusicApplication extends Application {
                 FileOperationTask.autoSync = false;
                 return;
             }
-            if (!ShareUtil.getInstance().getReadPermission()) {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 但是没有读取权限");
                 return;
             }

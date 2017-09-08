@@ -14,21 +14,21 @@ public class YLog {
 
     public static void i(String tag, String content) {
         if (DEBUG && tag != null && content != null)
-            Log.i(Constant.F_TAG + tag, content);
+            Log.i(YYConstant.F_TAG + tag, content);
     }
 
     public static void d(String tag, String content) {
         if (DEBUG && tag != null && content != null)
-            Log.d(Constant.F_TAG + tag, content);
+            Log.d(YYConstant.F_TAG + tag, content);
     }
 
     public static void e(String tag, String content) {
         if (DEBUG && tag != null && content != null)
-            Log.e(Constant.F_TAG + tag, content);
+            Log.e(YYConstant.F_TAG + tag, content);
     }
 
     public static void w(String tag, String content) {
         if (DEBUG && tag != null && content != null)
-            Log.w(Constant.F_TAG + tag, content);
+            Log.w(YYConstant.F_TAG + tag, content);
     }
 }

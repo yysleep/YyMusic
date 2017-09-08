@@ -78,24 +78,6 @@ public class ShareUtil {
         editor.apply();
     }
 
-    public void saveWritePermission() {
-        editor.putBoolean(MusicConst.WRITE_PERMISSION, true);
-        editor.apply();
-    }
-
-    public boolean getWritePermission() {
-        return sp.getBoolean(MusicConst.WRITE_PERMISSION, false);
-    }
-
-    public void saveReadPermission() {
-        editor.putBoolean(MusicConst.READ_PERMISSION, true);
-        editor.apply();
-    }
-
-    public boolean getReadPermission() {
-        return sp.getBoolean(MusicConst.READ_PERMISSION, false);
-    }
-
     public int getPlayMode() {
         return sp.getInt(MusicConst.PLAY_MODE, MusicConst.SEQUENTIAL_PLAY);
     }

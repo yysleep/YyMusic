@@ -6,7 +6,10 @@ package com.example.administrator.yymusic.util;
  * @author yysleep
  */
 
-public class Constant {
+public class YYConstant {
 
     public static final String F_TAG = "YY-MUSIC: ";
+
+    public static final int READ_PERMISSION = 1;
+    public static final int WRITE_PERMISSON = 2;
 }

@@ -1,13 +1,16 @@
 package com.example.administrator.yymusic.ui.main;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +32,7 @@ import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
+import com.example.administrator.yymusic.util.YYConstant;
 
 /**
  * Created by Administrator on 2016/5/25.
@@ -95,8 +99,13 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     mInfo = (MusicInfo) parent.getAdapter().getItem(position);
-                    if (mInfo != null && position >= 0)
-                        showAlert(position);
+                    if (mInfo != null && position >= 0) {
+                        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            ((MainActivity) getActivity()).showAlert(YYConstant.WRITE_PERMISSON);
+                        } else {
+                            showAlert(position);
+                        }
+                    }
                     return true;
                 }
             });
@@ -191,11 +200,6 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (!ShareUtil.getInstance().getWritePermission()) {
-                            Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除，请去设置界面开启相应的权限", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
                         YLog.d(TAG(), "[showAlert] info = " + mInfo);
                         if (mInfo.getIsPlaying() == 1) {
                             Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除正在播放的歌曲", Toast.LENGTH_SHORT).show();
