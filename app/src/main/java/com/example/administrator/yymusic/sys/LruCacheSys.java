@@ -1,19 +1,22 @@
 package com.example.administrator.yymusic.sys;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
-import android.util.Log;
 
 import com.example.administrator.yymusic.api.ITaskInterface;
 import com.example.administrator.yymusic.tool.BitmapDownLoadTask;
 import com.example.administrator.yymusic.util.YLog;
 
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by archermind on 17-6-8.
+ *
  * @author yysleep
  */
 public class LruCacheSys {
@@ -21,9 +24,11 @@ public class LruCacheSys {
     private static volatile LruCacheSys instance;
 
     private static LruCache<String, Bitmap> mMemoryCache;
-    private static HashMap<String, ITaskInterface> hashMap;
+    private static HashMap<String, ITaskInterface> mTaskMap;
+    private static Map<String, SoftReference<Bitmap>> mSortReferenceCache;
 
     private Set<BitmapDownLoadTask> taskCollection;
+    private static Context mContext;
 
     private static final String TAG = "LruCacheSys";
 
@@ -31,12 +36,14 @@ public class LruCacheSys {
 
     }
 
-    public static LruCacheSys getInstance() {
+    public static LruCacheSys getInstance(Context context) {
         if (instance == null) {
             synchronized (LruCacheSys.class) {
                 if (instance == null) {
+                    mContext = context.getApplicationContext();
                     instance = new LruCacheSys();
-                    hashMap = new HashMap<>();
+                    mTaskMap = new HashMap<>();
+                    mSortReferenceCache = new HashMap<>();
                     int maxMemory = (int) Runtime.getRuntime().maxMemory();
                     int cacheSize = maxMemory / 8;
                     // 设置图片缓存大小为程序最大可用内存的1/8
@@ -48,7 +55,10 @@ public class LruCacheSys {
 
                         @Override
                         protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
-                            super.entryRemoved(evicted, key, oldValue, newValue);
+                            if (oldValue != null) {
+                                SoftReference<Bitmap> s = new SoftReference<Bitmap>(oldValue);
+                                mSortReferenceCache.put(key, s);
+                            }
                         }
                     };
                 }
@@ -61,25 +71,34 @@ public class LruCacheSys {
         if (name == null)
             return;
 
-        if (hashMap.containsKey(name))
+        if (mTaskMap.containsKey(name))
             return;
 
-        hashMap.put(name, task);
+        mTaskMap.put(name, task);
     }
 
     public void unregisMusicObserver(String name) {
         if (name == null)
             return;
 
-        if (hashMap.containsKey(name))
-            hashMap.remove(name);
+        if (mTaskMap.containsKey(name))
+            mTaskMap.remove(name);
 
     }
 
     public Bitmap getBitmapFromMemoryCache(String key) {
         if (key == null)
             return null;
-        return mMemoryCache.get(key);
+        Bitmap bmp = mMemoryCache.get(key);
+        if (bmp == null) {
+            SoftReference<Bitmap> s = mSortReferenceCache.get(key);
+            if (s != null) {
+                bmp = s.get();
+                if (bmp != null)
+                    mMemoryCache.put(key, bmp);
+            }
+        }
+        return bmp;
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bmp) {
@@ -88,31 +107,31 @@ public class LruCacheSys {
         }
     }
 
-    public void refresh(String... params) {
+    public void refresh(BitmapDownLoadTask.Type type, String... params) {
         if (params.length < 2 || params[0] == null || params[1] == null)
             return;
 
-        ITaskInterface task = hashMap.get(params[0]);
+        ITaskInterface task = mTaskMap.get(params[0]);
         if (task == null)
             return;
 
         YLog.i(TAG, "[refresh] name = " + params[0]);
-        if (LruCacheSys.getInstance().getBitmapFromMemoryCache(params[1]) != null)
+        if (getBitmapFromMemoryCache(params[1]) != null)
             task.getBmpSuccess(params[1]);
         else
             task.getBmpFaild();
 
     }
 
-    public void startTask(String name, String url) {
-        YLog.i(TAG, "[startTask] name = " + name + " hashMap.get(name) = " + hashMap.get(name) +
+    public void startTask(String name, String url, BitmapDownLoadTask.Type type) {
+        YLog.i(TAG, "[startTask] name = " + name + " mTaskMap.get(name) = " + mTaskMap.get(name) +
                 "   getBitmapFromMemoryCache(url) = " + getBitmapFromMemoryCache(url) + "  url = " + url);
-        if (name == null || hashMap.get(name) == null)
+        if (name == null || mTaskMap.get(name) == null)
             return;
 
 
         YLog.i(TAG, "[startTask] name = " + name + " url = " + url);
-        BitmapDownLoadTask task = new BitmapDownLoadTask();
+        BitmapDownLoadTask task = new BitmapDownLoadTask(mContext, type);
         if (taskCollection == null)
             taskCollection = new HashSet<>();
 

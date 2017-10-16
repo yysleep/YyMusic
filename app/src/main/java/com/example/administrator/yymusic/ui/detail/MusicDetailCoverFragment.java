@@ -13,6 +13,7 @@ import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
+import com.example.administrator.yymusic.tool.BitmapDownLoadTask;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.util.YLog;
 
@@ -49,7 +50,7 @@ public class MusicDetailCoverFragment extends BaseFragment {
         MusicInfo info = MusicPlayer.getInstance().getSongInfo();
         Bitmap bitmap = null;
         if (info != null)
-            bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(info.getUrl());
+            bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(info.getUrl());
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
         else
@@ -62,11 +63,11 @@ public class MusicDetailCoverFragment extends BaseFragment {
         if (info == null || info.getUpdateTitle() == null)
             return;
         YLog.i(TAG(), "[refreshInfo]" + info.toString());
-        Bitmap bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
+        Bitmap bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
         else {
-            LruCacheSys.getInstance().startTask(TAG(), info.getUrl());
+            LruCacheSys.getInstance(getActivity()).startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Thumbnails);
         }
 
     }
@@ -75,7 +76,7 @@ public class MusicDetailCoverFragment extends BaseFragment {
     public void getBmpSuccess(String url) {
         if (url == null)
             return;
-        Bitmap bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(url);
+        Bitmap bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(url);
         if (bitmap != null && mCoverIv != null)
             mCoverIv.setImageBitmap(bitmap);
     }

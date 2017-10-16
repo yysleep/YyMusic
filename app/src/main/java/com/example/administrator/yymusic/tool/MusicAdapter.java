@@ -40,7 +40,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
         this.mContext = context;
         this.musicInfos = musicInfos;
         this.mView = view;
-        mLruCacheSys = LruCacheSys.getInstance();
+        mLruCacheSys = LruCacheSys.getInstance(context);
         view.setOnScrollListener(this);
         this.name = name;
     }
@@ -151,7 +151,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
                 downLoadSuccess(url);
                 continue;
             }
-            mLruCacheSys.startTask(name, url);
+            mLruCacheSys.startTask(name, url, BitmapDownLoadTask.Type.Thumbnails);
         }
     }
 

@@ -27,7 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ITaskCal
         // requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         super.onCreate(savedInstanceState);
         MusicPlayer.getInstance().registMusicObserver(TAG(), this);
-        LruCacheSys.getInstance().registMusicObserver(TAG(), this);
+        LruCacheSys.getInstance(this).registMusicObserver(TAG(), this);
     }
 
     @Override
@@ -49,7 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ITaskCal
     protected void onDestroy() {
         super.onDestroy();
         MusicPlayer.getInstance().unregisMusicObserver(TAG());
-        LruCacheSys.getInstance().unregisMusicObserver(TAG());
+        LruCacheSys.getInstance(this).unregisMusicObserver(TAG());
     }
 
     @Override
