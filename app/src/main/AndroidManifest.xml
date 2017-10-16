@@ -28,7 +28,7 @@
 
         <activity android:name=".ui.detail.MusicDetailActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThene.Base">
+            android:theme="@style/AppTheme.Base">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

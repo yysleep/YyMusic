@@ -45,6 +45,11 @@ public class LruCacheSys {
                         protected int sizeOf(String key, Bitmap bitmap) {
                             return bitmap.getByteCount();
                         }
+
+                        @Override
+                        protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
+                            super.entryRemoved(evicted, key, oldValue, newValue);
+                        }
                     };
                 }
             }
