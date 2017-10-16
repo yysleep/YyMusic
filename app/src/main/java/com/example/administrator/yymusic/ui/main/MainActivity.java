@@ -309,7 +309,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void getBmpSuccess(String url) {
-        // nothing
+        // todo
     }
 
     static class MusicHandler extends Handler {
