@@ -244,10 +244,12 @@ public class MainActivity extends BaseActivity {
                     instance.pause();
                     ivPlay.setImageResource(R.drawable.ic_music_play);
                     MusicPlayer.isPauseByMyself = true;
-                } else {
+                } else if (instance.isStarted()) {
                     MusicPlayer.getInstance().continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
                     MusicPlayer.isPauseByMyself = false;
+                } else {
+                    Toast.makeText(this, " 请选择一首歌曲吧", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.main_next_iv:
@@ -268,6 +270,11 @@ public class MainActivity extends BaseActivity {
                 }
                 instance.nextMusic();
                 break;
+
+            case R.id.main_drawer_detial_tv:
+                startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
+                break;
+
             default:
                 startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
 //                ActionBar actionBar = getSupportActionBar();
@@ -478,11 +485,10 @@ public class MainActivity extends BaseActivity {
             case REQUEST_WRITE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     YLog.d(TAG(), "[onRequestPermissionsResult] 已经拥有删除权限");
-                    Toast.makeText(MainActivity.this, "已获得删除权限，可以开始删除", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "已获得删除权限", Toast.LENGTH_LONG).show();
                 } else {
                     YLog.d(TAG(), "[onRequestPermissionsResult] 获取删除权限失败");
                     Toast.makeText(MainActivity.this, "获取删除权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
-
                 }
                 break;
             default:

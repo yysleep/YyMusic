@@ -59,12 +59,12 @@
             android:paddingTop="8dp">
 
             <TextView
-                android:background="@drawable/click_layout"
                 android:id="@+id/main_music_song_title_cv"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_weight="1"
+                android:background="@drawable/click_layout"
                 android:ellipsize="end"
                 android:gravity="left|center_vertical"
                 android:maxLines="1"
@@ -105,7 +105,16 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="64dp"
-        android:background="@color/colorAccent">
+        android:background="@color/colorAccent"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_marginTop="8dp"
+            android:onClick="onClickMain"
+            android:id="@+id/main_drawer_detial_tv"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="查看播放的音乐 -->" />
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>
