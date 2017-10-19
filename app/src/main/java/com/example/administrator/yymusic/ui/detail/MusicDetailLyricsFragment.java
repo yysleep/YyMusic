@@ -1,5 +1,6 @@
 package com.example.administrator.yymusic.ui.detail;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -53,13 +54,13 @@ public class MusicDetailLyricsFragment extends BaseFragment {
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
 
 
     }
 
     @Override
-    public void getBmpFaild() {
+    public void getBmpFailed() {
 
     }
 

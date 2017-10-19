@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.util.YLog;
@@ -21,6 +22,7 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
     private static final String TAG = "BitmapDownLoadTask";
     private Type mT;
     private Context mContext;
+    private Bitmap mBmpCover;
 
     public enum Type {
         Thumbnails,
@@ -38,19 +40,29 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
             return null;
 
         Bitmap bmp = createAlbumArts(params[1]);
-        if (bmp != null && mT == Type.Thumbnails)
-            LruCacheSys.getInstance(null).addBitmapToMemoryCache(params[1], bmp);
+        if (bmp == null) {
+            if (mT == Type.Cover)
+                return params;
+            else
+                return null;
+        }
+
+        if (mT == Type.Thumbnails)
+            LruCacheSys.getInstance().addBitmapToMemoryCache(params[1], bmp);
+        else
+            mBmpCover = bmp;
         return params;
     }
 
     @Override
     protected void onPostExecute(String[] params) {
         super.onPostExecute(params);
-        if (params == null || mContext == null)
+        if (params == null || params.length <= 0)
             return;
+        YLog.i(TAG, "[onPostExecute] name = " + params[0] + " mBmpCover = " + mBmpCover);
+        LruCacheSys.getInstance().refresh(mT, mBmpCover, params);
+        mBmpCover = null;
 
-        YLog.i(TAG, "[onPostExecute] name = " + params[0]);
-        LruCacheSys.getInstance(null).refresh(mT, params);
     }
 
     private Bitmap createAlbumArts(String filePath) {
@@ -79,6 +91,10 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
                 break;
 
             case Cover:
+                int width = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
+                if (width <= 0)
+                    width = 200;
+                options.inSampleSize = calculateInSampleSize(options, width, width);
                 break;
 
         }

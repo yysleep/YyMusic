@@ -23,18 +23,18 @@ public abstract class BaseFragment extends Fragment implements ITaskCallback ,IT
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MusicPlayer.getInstance().registMusicObserver(TAG(), this);
-        LruCacheSys.getInstance(getActivity()).registMusicObserver(TAG(), this);
+        LruCacheSys.getInstance().registMusicObserver(TAG(), this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         MusicPlayer.getInstance().unregisMusicObserver(TAG());
-        LruCacheSys.getInstance(getActivity()).unregisMusicObserver(TAG());
+        LruCacheSys.getInstance().unregisMusicObserver(TAG());
     }
 
     @Override
-    public void getBmpFaild() {
+    public void getBmpFailed() {
 
     }
 

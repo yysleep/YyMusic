@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -24,9 +25,10 @@ import com.example.administrator.yymusic.ui.base.BaseFragment;
 
 /**
  * Created by Administrator on 2016/5/25.
+ *
  * @author yysleep
  */
-public class MusicDiscoverFragment extends BaseFragment implements ITaskInterface{
+public class MusicDiscoverFragment extends BaseFragment implements ITaskInterface {
 
     private View view;
 
@@ -56,7 +58,7 @@ public class MusicDiscoverFragment extends BaseFragment implements ITaskInterfac
     public void initView() {
         TextView tvDiscover = (TextView) view.findViewById(R.id.fragment_local_collect_tv);
         ListView lvMusic = (ListView) view.findViewById(R.id.music_local_frgment_lv);
-        MusicAdapter musicApapter = new MusicAdapter(getActivity(), MusicSys.getInstance().getDiscoverMusics(),lvMusic,TAG());
+        MusicAdapter musicApapter = new MusicAdapter(getActivity(), MusicSys.getInstance().getDiscoverMusics(), lvMusic, TAG());
         if (MusicSys.getInstance().getDiscoverMusics().size() <= 0) {
             lvMusic.setVisibility(View.GONE);
             tvDiscover.setVisibility(View.VISIBLE);
@@ -88,7 +90,10 @@ public class MusicDiscoverFragment extends BaseFragment implements ITaskInterfac
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
+        if (cover != null)
+            return;
+
 //        if(musicApapter!=null)
 //            musicApapter.getBmpSuccess(url);
     }

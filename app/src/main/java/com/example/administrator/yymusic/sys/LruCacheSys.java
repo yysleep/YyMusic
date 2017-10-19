@@ -36,11 +36,10 @@ public class LruCacheSys {
 
     }
 
-    public static LruCacheSys getInstance(Context context) {
+    public static LruCacheSys getInstance() {
         if (instance == null) {
             synchronized (LruCacheSys.class) {
                 if (instance == null) {
-                    mContext = context.getApplicationContext();
                     instance = new LruCacheSys();
                     mTaskMap = new HashMap<>();
                     mSortReferenceCache = new HashMap<>();
@@ -65,6 +64,10 @@ public class LruCacheSys {
             }
         }
         return instance;
+    }
+
+    public void initContext(Context appContext) {
+        mContext = appContext;
     }
 
     public void registMusicObserver(String name, ITaskInterface task) {
@@ -107,7 +110,7 @@ public class LruCacheSys {
         }
     }
 
-    public void refresh(BitmapDownLoadTask.Type type, String... params) {
+    public void refresh(BitmapDownLoadTask.Type t, Bitmap cover, String... params) {
         if (params.length < 2 || params[0] == null || params[1] == null)
             return;
 
@@ -116,17 +119,17 @@ public class LruCacheSys {
             return;
 
         YLog.i(TAG, "[refresh] name = " + params[0]);
-        if (getBitmapFromMemoryCache(params[1]) != null)
-            task.getBmpSuccess(params[1]);
+        if (t == BitmapDownLoadTask.Type.Cover || getBitmapFromMemoryCache(params[1]) != null)
+            task.getBmpSuccess(cover, params[1]);
         else
-            task.getBmpFaild();
+            task.getBmpFailed();
 
     }
 
     public void startTask(String name, String url, BitmapDownLoadTask.Type type) {
         YLog.i(TAG, "[startTask] name = " + name + " mTaskMap.get(name) = " + mTaskMap.get(name) +
                 "   getBitmapFromMemoryCache(url) = " + getBitmapFromMemoryCache(url) + "  url = " + url);
-        if (name == null || mTaskMap.get(name) == null)
+        if (name == null || mTaskMap.get(name) == null || mContext == null)
             return;
 
 

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -25,10 +26,12 @@ import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.UpdateInfo;
+import com.example.administrator.yymusic.model.WeatherInfo;
 import com.example.administrator.yymusic.service.MusicService;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
+import com.example.administrator.yymusic.tool.WeatherTask;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
 import com.example.administrator.yymusic.util.YYConstant;
 import com.example.administrator.yymusic.util.ShareUtil;
@@ -36,16 +39,24 @@ import com.example.administrator.yymusic.util.YLog;
 import com.example.administrator.yymusic.widget.CircularProgressView;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import java.util.List;
 
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeather {
     private TextView tvSongTitle;
     private CircularProgressView cpProgress;
     private ImageView ivPlay;
+
+    private TextView tvWeather;
+    private TextView tvTemperature;
+    private TextView tvPower;
+    private TextView tvDetail;
     //    private ImageView ivPlayMode;
     public boolean isOutSide;
     Intent intent;
@@ -55,10 +66,13 @@ public class MainActivity extends BaseActivity {
     MusicPlayer instance;
     MusicHandler handler;
     ShareUtil shareUtil;
-    static final int REQUEST_WRITE = 200;
-    static final int REQUEST_READ = 201;
+    static final int REQUEST_WRITE = 300;
+    static final int REQUEST_READ = 301;
+    static final int REQUEST_INTENT = 400;
 
     static final int FRIST_INIT = 1000;
+
+    static final String URL = "http://www.sojson.com/open/api/weather/json.shtml?city=";
 
     @Override
     public String TAG() {
@@ -74,7 +88,7 @@ public class MainActivity extends BaseActivity {
         initToolBar();
         intent = new Intent(MainActivity.this, MusicService.class);
         startService(intent);
-        init();
+        initView();
         isOutSide = true;
         checkPermission();
     }
@@ -99,6 +113,16 @@ public class MainActivity extends BaseActivity {
         } else {
             showAlert(YYConstant.READ_PERMISSION);
         }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                String c = URLEncoder.encode("南京", "UTF-8");
+                new WeatherTask(MainActivity.this).execute(URL + c);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, REQUEST_WRITE);
+
     }
 
     void initToolBar() {
@@ -133,7 +157,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    public void init() {
+    public void initView() {
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_music_vp);
         if (viewPager != null) {
             viewPager.setAdapter(new TapPagerAdapter(getSupportFragmentManager(), getFragments(), true));
@@ -147,6 +171,11 @@ public class MainActivity extends BaseActivity {
         tvSongTitle = (TextView) findViewById(R.id.main_music_song_title_cv);
         cpProgress = (CircularProgressView) findViewById(R.id.main_music_progress_cv);
         ivPlay = (ImageView) findViewById(R.id.main_play_iv);
+
+        tvWeather = (TextView) findViewById(R.id.main_drawer_weather_tv);
+        tvTemperature = (TextView) findViewById(R.id.main_drawer_temperature_tv);
+        tvPower = (TextView) findViewById(R.id.main_drawer_power_tv);
+        tvDetail = (TextView) findViewById(R.id.main_drawer_detail_tv);
 //        ivPlayMode = (ImageView) findViewById(R.id.main_play_mode_iv);
 
 //        ivPlayMode.setOnClickListener(new View.OnClickListener() {
@@ -271,8 +300,11 @@ public class MainActivity extends BaseActivity {
                 instance.nextMusic();
                 break;
 
-            case R.id.main_drawer_detial_tv:
-                startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
+            case R.id.main_drawer_detail_tv:
+                // startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
+                break;
+
+            case R.id.main_drawer:
                 break;
 
             default:
@@ -308,14 +340,36 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
         // todo
     }
 
-    static class MusicHandler extends Handler {
+    @Override
+    public void weatherRespond(WeatherInfo info) {
+        if (info == null || info.getData() == null)
+            return;
+        List<WeatherInfo.Data.Forecast> forecastList = info.getData().getForecast();
+        if (forecastList == null || forecastList.size() <= 0)
+            return;
+        WeatherInfo.Data.Forecast todayW = forecastList.get(0);
+
+        String weather = todayW.getType();
+        tvWeather.setText("天气 ： " + (weather != null ? weather : "异常"));
+
+        String temperature = todayW.getHigh() + " - " + todayW.getLow();
+        tvTemperature.setText(temperature);
+
+        String power = todayW.getFx() + " - " + todayW.getFl();
+        tvPower.setText(power);
+
+        String detail = todayW.getNotice();
+        tvDetail.setText(detail != null ? detail : "异常");
+    }
+
+    private static class MusicHandler extends Handler {
         private final WeakReference<MainActivity> mainActivity;
 
-        public MusicHandler(MainActivity activity) {
+        private MusicHandler(MainActivity activity) {
             mainActivity = new WeakReference<>(activity);
         }
 
@@ -332,7 +386,7 @@ public class MainActivity extends BaseActivity {
                         break;
                     case FRIST_INIT:
                         activity.mInfo = ShareUtil.getInstance().getSongInfo();
-                        YLog.d(activity.TAG(), "[init] info = " + activity.mInfo);
+                        YLog.d(activity.TAG(), "[handleMessage] info = " + activity.mInfo);
                         if (activity.mInfo != null) {
                             activity.mProgress = ShareUtil.getInstance().getProgress();
                             activity.tvSongTitle.setText(activity.mInfo.getTitle());
@@ -352,7 +406,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    class MusicThread implements Runnable {
+    private class MusicThread implements Runnable {
 
         @Override
         public void run() {
@@ -489,6 +543,15 @@ public class MainActivity extends BaseActivity {
                 } else {
                     YLog.d(TAG(), "[onRequestPermissionsResult] 获取删除权限失败");
                     Toast.makeText(MainActivity.this, "获取删除权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
+                }
+                break;
+
+            case REQUEST_INTENT:
+                try {
+                    String c = URLEncoder.encode("南京", "UTF-8");
+                    new WeatherTask(MainActivity.this).execute(URL + c);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
                 break;
             default:

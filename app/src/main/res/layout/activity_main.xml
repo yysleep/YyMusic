@@ -101,20 +101,51 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="200dp"
+        android:id="@+id/main_drawer"
+        android:layout_width="240dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="64dp"
         android:background="@color/colorAccent"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <TextView
-            android:layout_marginTop="8dp"
-            android:onClick="onClickMain"
-            android:id="@+id/main_drawer_detial_tv"
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="查看播放的音乐 -->" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="今日天气"
+            android:textSize="18sp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/main_drawer_weather_tv"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/main_drawer_temperature_tv"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/main_drawer_power_tv"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/main_drawer_detail_tv"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

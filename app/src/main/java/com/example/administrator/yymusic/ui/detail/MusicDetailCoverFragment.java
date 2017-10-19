@@ -18,7 +18,7 @@ import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.util.YLog;
 
 /**
- * Created by archermind on 17-6-9.
+ * Created by  on 17-6-9.
  *
  * @author yysleep
  */
@@ -49,12 +49,15 @@ public class MusicDetailCoverFragment extends BaseFragment {
         mCoverIv = (ImageView) parentView.findViewById(R.id.fragment_detil_cover_iv);
         MusicInfo info = MusicPlayer.getInstance().getSongInfo();
         Bitmap bitmap = null;
-        if (info != null)
-            bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(info.getUrl());
+        if (info != null) {
+            bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(info.getUrl());
+            LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
+        }
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
         else
             mCoverIv.setImageResource(R.drawable.icon_default_album_art);
+
 
     }
 
@@ -63,26 +66,34 @@ public class MusicDetailCoverFragment extends BaseFragment {
         if (info == null || info.getUpdateTitle() == null)
             return;
         YLog.i(TAG(), "[refreshInfo]" + info.toString());
-        Bitmap bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
+        Bitmap bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
-        else {
-            LruCacheSys.getInstance(getActivity()).startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Thumbnails);
-        }
+
+        YLog.i(TAG(), "[refreshInfo] bitmap = " + bitmap);
+        LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
+
 
     }
 
     @Override
-    public void getBmpSuccess(String url) {
-        if (url == null)
+    public void getBmpSuccess(Bitmap cover, String url) {
+        if (url == null || mCoverIv == null)
             return;
-        Bitmap bitmap = LruCacheSys.getInstance(getActivity()).getBitmapFromMemoryCache(url);
-        if (bitmap != null && mCoverIv != null)
+        Bitmap bitmap = null;
+        if (cover == null)
+            bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(url);
+        else
+            bitmap = cover;
+
+        if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
+        else
+            mCoverIv.setImageResource(R.drawable.icon_default_album_art);
     }
 
     @Override
-    public void getBmpFaild() {
+    public void getBmpFailed() {
         if (mCoverIv != null)
             mCoverIv.setImageResource(R.drawable.icon_default_album_art);
     }

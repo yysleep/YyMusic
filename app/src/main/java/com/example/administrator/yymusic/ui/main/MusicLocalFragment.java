@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.FileOperationTask;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
+import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 import com.example.administrator.yymusic.util.YYConstant;
@@ -87,8 +89,10 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
             lvMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    if (MusicSys.getInstance().getLocalMusics().get(i).getIsPlaying() == 1)
+                    if (MusicSys.getInstance().getLocalMusics().get(i).getIsPlaying() == 1) {
+                        startActivity(new Intent(getActivity(), MusicDetailActivity.class));
                         return;
+                    }
 
                     MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 0);
                     MusicPlayer.isPauseByMyself = false;
@@ -187,7 +191,10 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
+        if (cover != null)
+            return;
+
         if (musicApapter != null)
             musicApapter.downLoadSuccess(url);
     }

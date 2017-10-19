@@ -1,6 +1,7 @@
 package com.example.administrator.yymusic.ui.detail;
 
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -296,7 +297,7 @@ public class MusicDetailActivity extends BaseActivity {
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
 
     }
 

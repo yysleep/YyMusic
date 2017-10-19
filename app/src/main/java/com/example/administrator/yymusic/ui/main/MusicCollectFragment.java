@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -27,6 +28,7 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
+import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
 import com.example.administrator.yymusic.util.YLog;
 
 /**
@@ -86,8 +88,10 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
             lvMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    if (MusicSys.getInstance().getCollectMusics().get(i).getIsPlaying() == 1)
+                    if (MusicSys.getInstance().getCollectMusics().get(i).getIsPlaying() == 1) {
+                        startActivity(new Intent(getActivity(), MusicDetailActivity.class));
                         return;
+                    }
 
                     MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 1);
                     MusicPlayer.isPauseByMyself = false;
@@ -194,7 +198,10 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     }
 
     @Override
-    public void getBmpSuccess(String url) {
+    public void getBmpSuccess(Bitmap cover, String url) {
+        if (cover != null)
+            return;
+
         if (musicApapter != null)
             musicApapter.downLoadSuccess(url);
     }

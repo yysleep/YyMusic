@@ -15,6 +15,7 @@ import android.view.WindowManager;
 
 import com.example.administrator.yymusic.common.MusicConst;
 import com.example.administrator.yymusic.dao.MusicDBMgr;
+import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.FileOperationTask;
@@ -41,6 +42,7 @@ public class MusicApplication extends Application {
 
         initStorage();
         MusicDBMgr.getInstance().init(this);
+        LruCacheSys.getInstance().initContext(getApplicationContext());
         length = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth() / 2;
 
         // MusicSys.getInstance().initMusicList(getApplicationContext());
