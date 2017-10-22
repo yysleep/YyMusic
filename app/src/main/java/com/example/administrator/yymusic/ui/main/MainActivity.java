@@ -213,7 +213,8 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         List<Fragment> fragments = new ArrayList<>();
         MusicDiscoverFragment fragment3 = new MusicDiscoverFragment();
         MusicCollectFragment fragment2 = new MusicCollectFragment();
-        MusicLocalFragment fragment1 = new MusicLocalFragment(fragment2);
+        MusicLocalFragment fragment1 = new MusicLocalFragment();
+        fragment1.setCallback(fragment2);
 
         fragments.add(fragment1);
         fragments.add(fragment2);

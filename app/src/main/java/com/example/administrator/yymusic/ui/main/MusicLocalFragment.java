@@ -51,7 +51,10 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
     private FileOperationTask mfileTask;
     private IFileOperationCallback callback;
 
-    public MusicLocalFragment(IFileOperationCallback callback) {
+    public MusicLocalFragment() {
+    }
+
+    public void setCallback(IFileOperationCallback callback) {
         this.callback = callback;
     }
 
@@ -239,7 +242,8 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                 YLog.d(TAG(), "[refreshDeleteFile] 当前列表为 本地列表");
             }
             musicApapter.notifyDataSetChanged();
-            callback.syncList(path);
+            if (callback != null)
+                callback.syncList(path);
 
             Toast.makeText(MusicLocalFragment.this.getActivity(), "已删除", Toast.LENGTH_SHORT).show();
         } else {

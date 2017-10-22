@@ -28,15 +28,15 @@ import com.example.administrator.yymusic.model.MusicInfo;
  * @author yysleep
  */
 public class MediaUtil {
-
+/*
     //获取专辑封面的Uri
     private static final Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
 
-    /**
+    *//**
      * 用于从数据库中查询歌曲的信息，保存在List当中
      *
      * @return
-     */
+     *//*
     public static List<MusicInfo> getMp3Infos(Context context) {
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null,
@@ -78,12 +78,12 @@ public class MediaUtil {
         return mp3Infos;
     }
 
-    /**
+    *//**
      * 往List集合中添加Map对象数据，每一个Map对象存放一首音乐的所有属性
      *
      * @param mp3Infos
      * @return
-     */
+     *//*
     public static List<HashMap<String, String>> getMusicMaps(
             List<MusicInfo> mp3Infos) {
         List<HashMap<String, String>> mp3list = new ArrayList<HashMap<String, String>>();
@@ -102,12 +102,12 @@ public class MediaUtil {
         return mp3list;
     }
 
-    /**
+    *//**
      * 格式化时间，将毫秒转换为分:秒格式
      *
      * @param time
      * @return
-     */
+     *//*
     public static String formatTime(long time) {
         String min = time / (1000 * 60) + "";
         String sec = time % (1000 * 60) + "";
@@ -129,12 +129,12 @@ public class MediaUtil {
     }
 
 
-    /**
+    *//**
      * 获取默认专辑图片
      *
      * @param context
      * @return
-     */
+     *//*
     public static Bitmap getDefaultArtwork(Context context, boolean small) {
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -145,14 +145,14 @@ public class MediaUtil {
     }
 
 
-    /**
+    *//**
      * 从文件当中获取专辑封面位图
      *
      * @param context
      * @param songid
      * @param albumid
      * @return
-     */
+     *//*
     private static Bitmap getArtworkFromFile(Context context, long songid, long albumid) {
         Bitmap bm = null;
         if (albumid < 0 && songid < 0) {
@@ -196,7 +196,7 @@ public class MediaUtil {
         return bm;
     }
 
-    /**
+    *//**
      * 获取专辑封面位图对象
      *
      * @param context
@@ -204,7 +204,7 @@ public class MediaUtil {
      * @param album_id
      * @param allowdefalut
      * @return
-     */
+     *//*
     public static Bitmap getArtwork(Context context, long song_id, long album_id, boolean allowdefalut, boolean small) {
         if (album_id < 0) {
             if (song_id < 0) {
@@ -231,8 +231,8 @@ public class MediaUtil {
                 options.inJustDecodeBounds = true;
                 //调用此方法得到options得到图片的大小
                 BitmapFactory.decodeStream(in, null, options);
-                /** 我们的目标是在你N pixel的画面上显示。 所以需要调用computeSampleSize得到图片缩放的比例 **/
-                /** 这里的target为800是根据默认专辑图片大小决定的，800只是测试数字但是试验后发现完美的结合 **/
+                *//** 我们的目标是在你N pixel的画面上显示。 所以需要调用computeSampleSize得到图片缩放的比例 **//*
+                *//** 这里的target为800是根据默认专辑图片大小决定的，800只是测试数字但是试验后发现完美的结合 **//*
                 if (small) {
                     options.inSampleSize = computeSampleSize(options, 40);
                 } else {
@@ -270,13 +270,13 @@ public class MediaUtil {
         return null;
     }
 
-    /**
+    *//**
      * 对图片进行合适的缩放
      *
      * @param options
      * @param target
      * @return
-     */
+     *//*
     public static int computeSampleSize(Options options, int target) {
         int w = options.outWidth;
         int h = options.outHeight;
@@ -297,5 +297,5 @@ public class MediaUtil {
             }
         }
         return candidate;
-    }
+    }*/
 }
