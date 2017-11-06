@@ -1,5 +1,6 @@
 package com.example.administrator.yymusic.ui.main;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,10 +44,13 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     ListView lvMusic;
     TextView tvCollect;
     private int mPosition;
+    private Activity mActivity;
 
     private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null)
+                return;
             if (intent.getAction().equals(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST)) {
                 if (musicApapter == null)
                     return;
@@ -67,16 +71,18 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_local_music, container, false);
         }
-        initView();
+        mActivity = getActivity();
+        if (mActivity != null)
+            initView();
         YLog.d(TAG(), "[onCreateView] ");
         return view;
     }
 
     public void initView() {
-        lvMusic = (ListView) view.findViewById(R.id.music_local_frgment_lv);
-        tvCollect = (TextView) view.findViewById(R.id.fragment_local_collect_tv);
+        lvMusic = view.findViewById(R.id.music_local_frgment_lv);
+        tvCollect = view.findViewById(R.id.fragment_local_collect_tv);
         IntentFilter intentFilter = new IntentFilter(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);
-        getActivity().registerReceiver(updateReceiver, intentFilter);
+        mActivity.registerReceiver(updateReceiver, intentFilter);
         musicApapter = new MusicAdapter(getActivity(), MusicSys.getInstance().getCollectMusics(), lvMusic, TAG());
         if (MusicSys.getInstance().getCollectMusics().size() <= 0) {
             lvMusic.setVisibility(View.GONE);
@@ -93,7 +99,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
                         return;
                     }
 
-                    MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 1);
+                    MusicPlayer.getInstance().startMusic(mActivity.getApplicationContext(), i, 1);
                     MusicPlayer.isPauseByMyself = false;
                 }
             });
@@ -118,7 +124,8 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().unregisterReceiver(updateReceiver);
+        if (mActivity != null)
+            mActivity.unregisterReceiver(updateReceiver);
     }
 
     @Override
@@ -164,7 +171,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     }
 
     private void showAlert(final MusicInfo info) {
-        AlertDialog alertDialog = new AlertDialog.Builder(MusicCollectFragment.this.getActivity()).
+        AlertDialog alertDialog = new AlertDialog.Builder(mActivity).
                 setTitle("是否移除歌曲").
                 setIcon(R.drawable.icon_launcher).
                 setPositiveButton("确定", new DialogInterface.OnClickListener() {
