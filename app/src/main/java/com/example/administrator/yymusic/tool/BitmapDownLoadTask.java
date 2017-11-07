@@ -87,7 +87,7 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
 
         switch (mT) {
             case Thumbnails:
-                options.inSampleSize = calculateInSampleSize(options, px(72), px(72));
+                options.inSampleSize = calculateInSampleSize(options, px(32), px(32));
                 break;
 
             case Cover:
@@ -99,8 +99,9 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
 
         }
         options.inJustDecodeBounds = false;
+        options.inPreferredConfig  = Bitmap.Config.RGB_565;
         Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-        YLog.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp);
+        YLog.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp + " --- 大小 = " + bmp.getByteCount() );
         return bmp;
     }
 
