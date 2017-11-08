@@ -1,5 +1,9 @@
 package com.example.administrator.yymusic.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +42,7 @@ public class WeatherInfo {
 
         private Yesterday yesterday;
 
-        private List<Forecast> forecast;
+        private ArrayList<Forecast> forecast;
 
         public String getShidu() {
             return shidu;
@@ -96,11 +100,11 @@ public class WeatherInfo {
             this.yesterday = yesterday;
         }
 
-        public List<Forecast> getForecast() {
+        public ArrayList<Forecast> getForecast() {
             return forecast;
         }
 
-        public void setForecast(List<Forecast> forecast) {
+        public void setForecast(ArrayList<Forecast> forecast) {
             this.forecast = forecast;
         }
 
@@ -223,7 +227,7 @@ public class WeatherInfo {
             }
         }
 
-        public static class Forecast {
+        public static class Forecast implements Parcelable{
 
             private String date;
 
@@ -244,6 +248,31 @@ public class WeatherInfo {
             private String type;
 
             private String notice;
+
+            protected Forecast(Parcel in) {
+                date = in.readString();
+                sunrise = in.readString();
+                high = in.readString();
+                low = in.readString();
+                sunset = in.readString();
+                aqi = in.readString();
+                fx = in.readString();
+                fl = in.readString();
+                type = in.readString();
+                notice = in.readString();
+            }
+
+            public static final Creator<Forecast> CREATOR = new Creator<Forecast>() {
+                @Override
+                public Forecast createFromParcel(Parcel in) {
+                    return new Forecast(in);
+                }
+
+                @Override
+                public Forecast[] newArray(int size) {
+                    return new Forecast[size];
+                }
+            };
 
             public String getDate() {
                 return date;
@@ -339,6 +368,25 @@ public class WeatherInfo {
                         ", type='" + type + '\'' +
                         ", notice='" + notice + '\'' +
                         '}';
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel parcel, int i) {
+                parcel.writeString(date);
+                parcel.writeString(sunrise);
+                parcel.writeString(high);
+                parcel.writeString(low);
+                parcel.writeString(sunset);
+                parcel.writeString(aqi);
+                parcel.writeString(fx);
+                parcel.writeString(fl);
+                parcel.writeString(type);
+                parcel.writeString(notice);
             }
         }
 

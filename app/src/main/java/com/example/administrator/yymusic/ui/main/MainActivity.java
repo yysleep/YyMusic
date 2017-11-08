@@ -1,10 +1,15 @@
 package com.example.administrator.yymusic.ui.main;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -13,15 +18,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.design.widget.TabLayout;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
 import com.example.administrator.yymusic.model.MusicInfo;
@@ -33,6 +44,7 @@ import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.tool.WeatherTask;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.ui.weather.WeatherActivity;
 import com.example.administrator.yymusic.util.YYConstant;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
@@ -41,7 +53,6 @@ import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
@@ -53,10 +64,15 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     private CircularProgressView cpProgress;
     private ImageView ivPlay;
 
+    private DrawerLayout mDrawer;
+    private View mDrawerLin;
+    private TextView tvLocation;
+    private TextView tvDrawerTitle;
     private TextView tvWeather;
     private TextView tvTemperature;
     private TextView tvPower;
     private TextView tvDetail;
+    private Button btnMore;
     //    private ImageView ivPlayMode;
     public boolean isOutSide;
     Intent intent;
@@ -66,11 +82,24 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     MusicPlayer instance;
     MusicHandler handler;
     ShareUtil shareUtil;
+    public WeatherInfo mWeatherInfo;
+
+    // 百度SDK 相关信息
+    private LocationClient mLocationClient;
+    private LocationListener bdListener;
+
+    private BroadcastReceiver mNetWorkReceiver;
     static final int REQUEST_WRITE = 300;
     static final int REQUEST_READ = 301;
-    static final int REQUEST_INTENT = 400;
+    static final int REQUEST_INTENT = 302;
+    static final int REQUEST_PHONE_STATE = 303;
+    static final int REQUEST_LOCATION = 304;
+    static final int REQUEST_ASK_WEATHER = 305;
 
-    static final int FRIST_INIT = 1000;
+    static final int MESSAGE_FIRST_INIT = 1000;
+    static final int MESSAGE_LOCATION = 1001;
+    static final int MESSAGE_NETWORK_CHANGE = 1002;
+    private boolean needNetWork;
 
     static final String URL = "http://www.sojson.com/open/api/weather/json.shtml?city=";
 
@@ -90,6 +119,8 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         startService(intent);
         initView();
         isOutSide = true;
+        init();
+        initSdk();
         checkPermission();
     }
 
@@ -106,27 +137,32 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
                     getApplicationContext().sendBroadcast(intent);
                     Message msg = Message.obtain();
-                    msg.what = FRIST_INIT;
+                    msg.what = MESSAGE_FIRST_INIT;
                     handler.sendMessage(msg);
                 }
             }).start();
         } else {
             showAlert(YYConstant.READ_PERMISSION);
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
-            try {
-                String c = URLEncoder.encode("南京", "UTF-8");
-                new WeatherTask(MainActivity.this).execute(URL + c);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        } else
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, REQUEST_WRITE);
+        }
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_PHONE_STATE);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (mWeatherInfo == null)
+                mLocationClient.start();
+            YLog.d(TAG(), "[checkPermission] 获取位置权限成功, 开始获取地理位置");
+        } else
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
     }
 
     void initToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
         toolbar.setTitle("音乐");
         setSupportActionBar(toolbar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -158,24 +194,29 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     }
 
     public void initView() {
-        ViewPager viewPager = (ViewPager) findViewById(R.id.main_music_vp);
+        ViewPager viewPager = findViewById(R.id.main_music_vp);
         if (viewPager != null) {
             viewPager.setAdapter(new TapPagerAdapter(getSupportFragmentManager(), getFragments(), true));
             viewPager.setCurrentItem(0);
         }
-        TabLayout tableLayout = (TabLayout) findViewById(R.id.main_tabs);
+        TabLayout tableLayout = findViewById(R.id.main_tabs);
         if (tableLayout != null) {
             tableLayout.setupWithViewPager(viewPager);
         }
 
-        tvSongTitle = (TextView) findViewById(R.id.main_music_song_title_cv);
-        cpProgress = (CircularProgressView) findViewById(R.id.main_music_progress_cv);
-        ivPlay = (ImageView) findViewById(R.id.main_play_iv);
+        tvSongTitle = findViewById(R.id.main_music_song_title_cv);
+        cpProgress = findViewById(R.id.main_music_progress_cv);
+        ivPlay = findViewById(R.id.main_play_iv);
 
-        tvWeather = (TextView) findViewById(R.id.main_drawer_weather_tv);
-        tvTemperature = (TextView) findViewById(R.id.main_drawer_temperature_tv);
-        tvPower = (TextView) findViewById(R.id.main_drawer_power_tv);
-        tvDetail = (TextView) findViewById(R.id.main_drawer_detail_tv);
+        mDrawer = findViewById(R.id.main_drawer);
+        mDrawerLin = findViewById(R.id.main_drawer_ll);
+        tvLocation = findViewById(R.id.main_drawer_location_tv);
+        tvDrawerTitle = findViewById(R.id.main_drawer_title_tv);
+        tvWeather = findViewById(R.id.main_drawer_weather_tv);
+        tvTemperature = findViewById(R.id.main_drawer_temperature_tv);
+        tvPower = findViewById(R.id.main_drawer_power_tv);
+        tvDetail = findViewById(R.id.main_drawer_detail_tv);
+        btnMore = findViewById(R.id.main_drawer_more_btn);
 //        ivPlayMode = (ImageView) findViewById(R.id.main_play_mode_iv);
 
 //        ivPlayMode.setOnClickListener(new View.OnClickListener() {
@@ -209,6 +250,33 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         initMode(ShareUtil.getInstance().getPlayMode());
     }
 
+    private void init() {
+        mNetWorkReceiver = new NetWorkStateReceiver();
+        registerReceiver(mNetWorkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void initSdk() {
+        if (mLocationClient != null) {
+            if (bdListener != null) {
+                mLocationClient.unRegisterLocationListener(bdListener);
+                bdListener = null;
+            }
+            mLocationClient = null;
+        }
+
+        bdListener = new LocationListener();
+        mLocationClient = new LocationClient(getApplicationContext());
+        //声明LocationClient类
+        mLocationClient.registerLocationListener(bdListener);
+        LocationClientOption option = new LocationClientOption();
+
+        option.setIsNeedAddress(true);
+        //可选，是否需要地址信息，默认为不需要，即参数为false
+        //如果开发者需要获得当前点的地址信息，此处必须为true
+
+        mLocationClient.setLocOption(option);
+    }
+
     private List<Fragment> getFragments() {
         List<Fragment> fragments = new ArrayList<>();
         MusicDiscoverFragment fragment3 = new MusicDiscoverFragment();
@@ -238,7 +306,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             }
         }
 
-
         // todo  控制播放的状态
         if (instance.isPauseing()) {
             ivPlay.setImageResource(R.drawable.ic_music_play);
@@ -252,6 +319,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         if (instance.getSongInfo() != null) {
             isContinue = false;
         }
+
     }
 
     public void onClickMain(View v) {
@@ -305,9 +373,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 // startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
                 break;
 
-            case R.id.main_drawer:
-                break;
-
             default:
                 startActivity(new Intent(MainActivity.this, MusicDetailActivity.class));
 //                ActionBar actionBar = getSupportActionBar();
@@ -324,6 +389,32 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 break;
         }
 
+    }
+
+    public void onClickMainDrawer(View v) {
+        switch (v.getId()) {
+            case R.id.main_drawer_location_tv:
+                if (mLocationClient != null && mWeatherInfo == null) {
+                    initSdk();
+                    mLocationClient.start();
+                    YLog.d(TAG(), "[onClickMainDrawer] 刷新位置");
+                }
+                break;
+            case R.id.main_drawer_more_btn:
+                mDrawer.closeDrawer(mDrawerLin);
+                if (mWeatherInfo == null || mWeatherInfo.getData() == null || mWeatherInfo.getData().getForecast() == null)
+                    return;
+                ArrayList<WeatherInfo.Data.Forecast> forecasts = mWeatherInfo.getData().getForecast();
+                if (forecasts.isEmpty())
+                    return;
+                YLog.d(TAG(), "[onClickMainDrawer] mWeatherInfo = " + mWeatherInfo);
+                Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+                intent.putParcelableArrayListExtra(WeatherActivity.KEY_WEATHER, forecasts);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -349,6 +440,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     public void weatherRespond(WeatherInfo info) {
         if (info == null || info.getData() == null)
             return;
+        mWeatherInfo = info;
+        tvDrawerTitle.setText("今日天气");
+        btnMore.setVisibility(View.VISIBLE);
         List<WeatherInfo.Data.Forecast> forecastList = info.getData().getForecast();
         if (forecastList == null || forecastList.size() <= 0)
             return;
@@ -365,6 +459,11 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
         String detail = todayW.getNotice();
         tvDetail.setText(detail != null ? detail : "异常");
+    }
+
+    @Override
+    public void weatherFailed() {
+        tvDrawerTitle.setText("网络异常，无法获取天气");
     }
 
     private static class MusicHandler extends Handler {
@@ -385,7 +484,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         int progress = (int) ((float) currentPosition * 100 / max);
                         activity.cpProgress.setProgress(progress);
                         break;
-                    case FRIST_INIT:
+                    case MESSAGE_FIRST_INIT:
                         activity.mInfo = ShareUtil.getInstance().getSongInfo();
                         YLog.d(activity.TAG(), "[handleMessage] info = " + activity.mInfo);
                         if (activity.mInfo != null) {
@@ -399,6 +498,37 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                             activity.tvSongTitle.setText("快去听歌吧");
                         }
                         activity.cpProgress.setProgress(activity.mProgress);
+                        break;
+                    case MESSAGE_LOCATION:
+                        String city = (String) msg.obj;
+                        if (city != null) {
+                            activity.tvLocation.setText("当前城市：" + city);
+                            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
+                                String c = null;
+                                try {
+                                    c = URLEncoder.encode(city, "UTF-8");
+                                    new WeatherTask(activity).execute(URL + c);
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                    YLog.d("MainActivity", "[handleMessage]城市文字转化异常");
+                                }
+                            } else {
+                                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.INTERNET}, REQUEST_ASK_WEATHER);
+                            }
+                        } else
+                            activity.tvDrawerTitle.setText("网络异常，无法获取天气");
+                        break;
+
+                    case MESSAGE_NETWORK_CHANGE:
+                        YLog.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] ");
+                        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                                ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            if (activity.mWeatherInfo == null) {
+                                activity.mLocationClient.start();
+                                YLog.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] 获取位置");
+                            }
+                        } else
+                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
                         break;
                     default:
                         break;
@@ -473,6 +603,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         if (!instance.isPlaying()) {
             stopService(intent);
         }
+        unregisterReceiver(mNetWorkReceiver);
+        if (mLocationClient != null)
+            mLocationClient.unRegisterLocationListener(bdListener);
     }
 
     public void showAlert(final int type) {
@@ -528,7 +661,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                             intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, false);
                             getApplicationContext().sendBroadcast(intent);
                             Message msg = Message.obtain();
-                            msg.what = FRIST_INIT;
+                            msg.what = MESSAGE_FIRST_INIT;
                             handler.sendMessage(msg);
                         }
                     }).start();
@@ -548,16 +681,132 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 break;
 
             case REQUEST_INTENT:
-                try {
-                    String c = URLEncoder.encode("南京", "UTF-8");
-                    new WeatherTask(MainActivity.this).execute(URL + c);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 获取网络权限成功");
+                break;
+
+            case REQUEST_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (mWeatherInfo != null)
+                        return;
+                    initSdk();
+                    mLocationClient.start();
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 获取位置权限成功，开始获取地理位置");
+                } else
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 获取位置权限失败");
+                break;
+
+            case REQUEST_ASK_WEATHER:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && bdListener != null && bdListener.getCity() != null) {
+                    try {
+                        String c = URLEncoder.encode(bdListener.getCity(), "UTF-8");
+                        new WeatherTask(MainActivity.this).execute(URL + c);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 开始获取天气");
+                } else
+                    YLog.d(TAG(), "[onRequestPermissionsResult] 天气的网络权限获取失败");
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
+        }
+    }
+
+    public class LocationListener implements BDLocationListener {
+        String address;    //获取详细地址信息
+        String country;    //获取国家
+        String province;    //获取省份
+        String city;    //获取城市
+        String district;    //获取区县
+        String street;    //获取街道信息
+
+        @Override
+        public void onReceiveLocation(BDLocation bdLocation) {
+            address = bdLocation.getAddrStr();    //获取详细地址信息
+            country = bdLocation.getCountry();    //获取国家
+            province = bdLocation.getProvince();    //获取省份
+            city = bdLocation.getCity();    //获取城市
+            district = bdLocation.getDistrict();    //获取区县
+            street = bdLocation.getStreet();    //获取街道信息
+            YLog.d("MainActivity", "地理位置 = " + city);
+            if (handler != null) {
+                Message msg = handler.obtainMessage(MESSAGE_LOCATION, city);
+                msg.sendToTarget();
+
+            }
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public String getProvince() {
+            return province;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+    }
+
+    public class NetWorkStateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (!needNetWork) {
+                needNetWork = true;
+                return;
+            }
+            if (mWeatherInfo != null)
+                return;
+            YLog.d(TAG(), "[NetWorkStateReceiver][onReceive] action = " + intent.getAction());
+            YLog.d(TAG(), "[NetWorkStateReceiver][onReceive] 网络状态发生变化");
+            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connMgr == null) {
+                YLog.d(TAG(), "[NetWorkStateReceiver][onReceive] ConnectivityManager == null");
+                return;
+            }
+            Network[] networks = connMgr.getAllNetworks();
+            for (Network network : networks) {
+                Boolean isConnected = connMgr.getNetworkInfo(network).isConnected();
+                YLog.d(TAG(), "[NetWorkStateReceiver][onReceive] isConnected = " + isConnected);
+                if (isConnected) {
+                    initSdk();
+                    if (mLocationClient != null) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(3000);
+                                    if (handler != null) {
+                                        Message msg = handler.obtainMessage(MESSAGE_NETWORK_CHANGE);
+                                        msg.sendToTarget();
+                                    }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                    YLog.d(TAG(), "[NetWorkStateReceiver][onReceive] 检测到手机网络");
+                    Toast.makeText(context, "检测到手机网络", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+            }
         }
     }
 }

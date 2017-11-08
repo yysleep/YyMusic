@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/main_drawer"
     android:layout_height="match_parent"
     tools:context=".ui.main.MainActivity">
 
@@ -76,7 +77,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="12dp"
+                android:layout_marginEnd="12dp"
                 android:onClick="onClickMain"
                 android:src="@drawable/ic_music_stop" />
 
@@ -85,7 +86,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="12dp"
+                android:layout_marginEnd="12dp"
                 android:onClick="onClickMain"
                 android:src="@drawable/music_next" />
 
@@ -94,60 +95,81 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="12dp"
+                android:layout_marginEnd="12dp"
                 android:onClick="onClickMain" />
 
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:clickable="true"
-        android:focusable="true"
-        android:id="@+id/main_drawer"
-        android:layout_width="240dp"
+        android:id="@+id/main_drawer_ll"
+        android:layout_width="288dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="64dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/weather_bck"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
         android:padding="8dp">
 
         <TextView
-            android:gravity="center"
+            android:id="@+id/main_drawer_location_tv"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="今日天气"
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:onClick="onClickMainDrawer"
+            android:text="当前城市：未知"
+            android:textColor="@color/textColor"
             android:textSize="18sp" />
 
         <TextView
-            android:gravity="center"
+            android:id="@+id/main_drawer_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:text="今日天气"
+            android:textColor="@color/textColor" />
+
+        <TextView
             android:id="@+id/main_drawer_weather_tv"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp" />
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:textColor="@color/textColor" />
 
         <TextView
-            android:gravity="center"
             android:id="@+id/main_drawer_temperature_tv"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp" />
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:textColor="@color/textColor" />
 
         <TextView
-            android:gravity="center"
             android:id="@+id/main_drawer_power_tv"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp" />
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:textColor="@color/textColor" />
 
         <TextView
-            android:gravity="center"
             android:id="@+id/main_drawer_detail_tv"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp" />
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:textColor="@color/textColor" />
+
+        <Button
+            android:visibility="gone"
+            android:background="@color/colorAccent"
+            android:onClick="onClickMainDrawer"
+            android:id="@+id/main_drawer_more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_margin="8dp"
+            android:text="一周天气"
+            android:layout_gravity="bottom"
+            android:textColor="@color/textColor" />
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

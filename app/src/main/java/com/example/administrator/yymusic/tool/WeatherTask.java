@@ -25,6 +25,7 @@ public class WeatherTask extends AsyncTask<String, Void, WeatherInfo> {
 
     public interface ITaskWeather {
         void weatherRespond(WeatherInfo info);
+        void weatherFailed();
     }
 
     public WeatherTask(ITaskWeather iTaskWeather) {
@@ -77,5 +78,7 @@ public class WeatherTask extends AsyncTask<String, Void, WeatherInfo> {
         super.onPostExecute(weatherInfo);
         if (weatherInfo != null)
             mITaskWeather.weatherRespond(weatherInfo);
+        else
+            mITaskWeather.weatherFailed();
     }
 }
