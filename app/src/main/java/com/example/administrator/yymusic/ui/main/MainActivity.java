@@ -119,10 +119,10 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         instance = MusicPlayer.getInstance();
         shareUtil = ShareUtil.getInstance();
         setContentView(R.layout.activity_main);
-        initToolBar();
         intent = new Intent(MainActivity.this, MusicService.class);
         startService(intent);
         initView();
+        initToolBar();
         isOutSide = true;
         init();
         initSdk();
@@ -150,7 +150,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             showAlert(YYConstant.READ_PERMISSION);
         }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, REQUEST_WRITE);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTENT);
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
@@ -168,8 +168,17 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
     void initToolBar() {
         Toolbar toolbar = findViewById(R.id.main_toolbar);
-        toolbar.setTitle("音乐");
+        // toolbar.setTitle("音乐");
+        toolbar.setNavigationIcon(R.mipmap.icons_cloud);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawer.openDrawer(mDrawerLin);
+            }
+        });
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -331,6 +340,13 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!mDrawer.isClickable())
+            mDrawer.closeDrawer(mDrawerLin);
+    }
+
     public void onClickMain(View v) {
 
         switch (v.getId()) {
@@ -410,7 +426,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 }
                 break;
             case R.id.main_drawer_more_btn:
-                mDrawer.closeDrawer(mDrawerLin);
                 if (mWeatherInfo == null || mWeatherInfo.getData() == null || mWeatherInfo.getData().getForecast() == null)
                     return;
 

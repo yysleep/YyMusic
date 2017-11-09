@@ -56,6 +56,13 @@ public class WeatherSys {
         return " -- ";
     }
 
+    public String getSimpleDay(WeatherInfo.Data.Forecast forecast){
+        if (forecast != null) {
+            return forecast.getDate().substring(3);
+        }
+        return " -- ";
+    }
+
     public String getHighTemperature(WeatherInfo.Data.Forecast forecast) {
         if (forecast != null) {
             return forecast.getHigh().substring(2);

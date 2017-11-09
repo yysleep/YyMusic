@@ -47,7 +47,7 @@ public class NotificationSys {
         if (mBuilder == null) {
             mBuilder = createBuiler(context.getApplicationContext())
                     .setContentTitle("yymusic")
-                    .setSmallIcon(R.mipmap.icon_launcher);
+                    .setSmallIcon(R.mipmap.icon_yymusic_launcher);
             mNotification = mBuilder.build();
             mMgr = createNotificationManager(context.getApplicationContext());
             context.startForeground(NOTIFICATION_ID, mNotification);

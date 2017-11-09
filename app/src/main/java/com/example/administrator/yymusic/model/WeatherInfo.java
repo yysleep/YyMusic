@@ -1,9 +1,5 @@
 package com.example.administrator.yymusic.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**

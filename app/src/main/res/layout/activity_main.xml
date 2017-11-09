@@ -15,6 +15,7 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/main_toolbar"
+            android:paddingLeft="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/musicTheme"
@@ -167,9 +168,9 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_margin="8dp"
-            android:text="一周天气"
+            android:text="一周详情"
             android:layout_gravity="bottom"
-            android:textColor="@color/textColor" />
+            android:textColor="@color/bgGray" />
 
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

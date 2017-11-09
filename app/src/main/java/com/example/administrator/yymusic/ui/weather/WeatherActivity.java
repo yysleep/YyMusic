@@ -107,16 +107,23 @@ public class WeatherActivity extends AppCompatActivity {
                 holder = new ViewHolder();
                 holder.tvDay = view.findViewById(R.id.item_weather_day_tv);
                 holder.tvWeather = view.findViewById(R.id.item_weather_weather_tv);
-                holder.tvPower = view.findViewById(R.id.item_weather_power_tv);
                 holder.tvTemperature = view.findViewById(R.id.item_weather_temperature_tv);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
             }
             WeatherInfo.Data.Forecast info = mList.get(i);
-            holder.tvDay.setText(info.getDate());
-            holder.tvWeather.setText(info.getType());
-            holder.tvPower.setText(info.getFx() + " : " + info.getFl());
+            String day = info.getDate();
+            if (i == 0){
+                day ="今天 ";
+            }else if(i == 1){
+                day ="明天 ";
+            }else {
+                day = weaInstance.getSimpleDay(info);
+            }
+            holder.tvDay.setText(day);
+            String detail = info.getType() + " | " + info.getFx();
+            holder.tvWeather.setText(detail);
             holder.tvTemperature.setText(weaInstance.getTemperature(info));
             return view;
         }
@@ -125,7 +132,6 @@ public class WeatherActivity extends AppCompatActivity {
     private static class ViewHolder {
         private TextView tvDay;
         private TextView tvWeather;
-        private TextView tvPower;
         private TextView tvTemperature;
     }
 }
