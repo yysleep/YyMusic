@@ -633,7 +633,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         AlertDialog alertDialog = new AlertDialog.Builder(this).
                 setTitle("权限说明").
                 setMessage("开启访问音频文件的权限").
-                setIcon(R.drawable.icon_launcher).
+                setIcon(R.mipmap.icon_yymusic_launcher).
                 setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
                     @Override

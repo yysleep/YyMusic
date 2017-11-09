@@ -205,7 +205,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
     private void showAlert(final int position) {
         AlertDialog alertDialog = new AlertDialog.Builder(MusicLocalFragment.this.getActivity()).
                 setTitle("是否删除文件").
-                setIcon(R.drawable.icon_launcher).
+                setIcon(R.mipmap.icon_yymusic_launcher).
                 setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
                     @Override

@@ -173,7 +173,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
     private void showAlert(final MusicInfo info) {
         AlertDialog alertDialog = new AlertDialog.Builder(mActivity).
                 setTitle("是否移除歌曲").
-                setIcon(R.drawable.icon_launcher).
+                setIcon(R.mipmap.icon_yymusic_launcher).
                 setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
                     @Override
