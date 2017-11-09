@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.model.WeatherInfo;
+import com.example.administrator.yymusic.sys.WeatherSys;
 import com.example.administrator.yymusic.util.YLog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,21 +26,31 @@ import java.util.List;
 public class WeatherActivity extends AppCompatActivity {
 
     private List<WeatherInfo.Data.Forecast> mList;
-    public static final String KEY_WEATHER = "weather";
     public static final String TAG = "WeatherActivity";
+    WeatherSys weaInstance;
+    private TextView tvStreet;
+    private TextView tvCurrentTemperature;
+    private TextView tvWeatherDetail;
+    private TextView tvWind;
+    private TextView tvPower;
+    private TextView tvShiduB;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        initView();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (getIntent() == null)
+        weaInstance = WeatherSys.getInstance();
+        WeatherInfo info = weaInstance.getWeatherInfo();
+        if (info == null || info.getData() == null)
             return;
-        ArrayList<WeatherInfo.Data.Forecast> forecasts = getIntent().getParcelableArrayListExtra(KEY_WEATHER);
+
+        List<WeatherInfo.Data.Forecast> forecasts = info.getData().getForecast();
         YLog.d(TAG, "[onStart] forecasts = " + forecasts);
         if (forecasts == null || forecasts.isEmpty())
             return;
@@ -51,6 +61,25 @@ public class WeatherActivity extends AppCompatActivity {
         WeatherAdapter adapter = new WeatherAdapter();
         ListView listView = findViewById(R.id.weather_fragment_lv);
         listView.setAdapter(adapter);
+
+        WeatherInfo.Data.Forecast forecastInfo = forecasts.get(0);
+        if(forecastInfo == null)
+            return;
+        tvStreet.setText(weaInstance.getStreetDetail());
+        tvCurrentTemperature.setText(weaInstance.getHighTemperature(forecastInfo));
+        tvWeatherDetail.setText(weaInstance.getWeatherDetail(forecastInfo));
+        tvWind.setText(forecastInfo.getFx());
+        tvPower.setText(forecastInfo.getFl());
+        tvShiduB.setText(info.getData().getShidu());
+    }
+
+    private void initView() {
+        tvStreet = findViewById(R.id.weather_street_tv);
+        tvCurrentTemperature = findViewById(R.id.weather_current_temperature_tv);
+        tvWeatherDetail = findViewById(R.id.weather_weather_detail_tv);
+        tvWind = findViewById(R.id.weather_wind_tv);
+        tvPower = findViewById(R.id.weather_power_tv);
+        tvShiduB = findViewById(R.id.weather_shidu_b_tv);
     }
 
     private class WeatherAdapter extends BaseAdapter {
@@ -88,7 +117,7 @@ public class WeatherActivity extends AppCompatActivity {
             holder.tvDay.setText(info.getDate());
             holder.tvWeather.setText(info.getType());
             holder.tvPower.setText(info.getFx() + " : " + info.getFl());
-            holder.tvTemperature.setText(info.getHigh() + " - " + info.getLow());
+            holder.tvTemperature.setText(weaInstance.getTemperature(info));
             return view;
         }
     }

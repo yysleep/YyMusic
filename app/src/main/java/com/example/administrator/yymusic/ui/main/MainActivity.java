@@ -35,12 +35,14 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.common.MusicConst;
+import com.example.administrator.yymusic.model.LocationInfo;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.model.WeatherInfo;
 import com.example.administrator.yymusic.service.MusicService;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
+import com.example.administrator.yymusic.sys.WeatherSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.tool.WeatherTask;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
@@ -82,11 +84,14 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     MusicPlayer instance;
     MusicHandler handler;
     ShareUtil shareUtil;
-    public WeatherInfo mWeatherInfo;
+    private WeatherInfo mWeatherInfo;
+    private LocationInfo mLocationInfo;
+
 
     // 百度SDK 相关信息
     private LocationClient mLocationClient;
-    private LocationListener bdListener;
+    private LocationListener mBDListener;
+    private LocationClientOption mOption;
 
     private BroadcastReceiver mNetWorkReceiver;
     static final int REQUEST_WRITE = 300;
@@ -251,30 +256,34 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     }
 
     private void init() {
+        mLocationInfo = new LocationInfo();
         mNetWorkReceiver = new NetWorkStateReceiver();
         registerReceiver(mNetWorkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void initSdk() {
         if (mLocationClient != null) {
-            if (bdListener != null) {
-                mLocationClient.unRegisterLocationListener(bdListener);
-                bdListener = null;
+            if (mBDListener != null) {
+                mLocationClient.unRegisterLocationListener(mBDListener);
+                mBDListener = null;
             }
             mLocationClient = null;
         }
 
-        bdListener = new LocationListener();
-        mLocationClient = new LocationClient(getApplicationContext());
-        //声明LocationClient类
-        mLocationClient.registerLocationListener(bdListener);
-        LocationClientOption option = new LocationClientOption();
+        if (mBDListener == null) {
+            mBDListener = new LocationListener();
+            mOption = new LocationClientOption();
+            mOption.setIsNeedAddress(true);
+        }
 
-        option.setIsNeedAddress(true);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(mBDListener);
+
         //可选，是否需要地址信息，默认为不需要，即参数为false
         //如果开发者需要获得当前点的地址信息，此处必须为true
 
-        mLocationClient.setLocOption(option);
+        if (mOption != null)
+            mLocationClient.setLocOption(mOption);
     }
 
     private List<Fragment> getFragments() {
@@ -404,13 +413,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 mDrawer.closeDrawer(mDrawerLin);
                 if (mWeatherInfo == null || mWeatherInfo.getData() == null || mWeatherInfo.getData().getForecast() == null)
                     return;
-                ArrayList<WeatherInfo.Data.Forecast> forecasts = mWeatherInfo.getData().getForecast();
-                if (forecasts.isEmpty())
-                    return;
+
                 YLog.d(TAG(), "[onClickMainDrawer] mWeatherInfo = " + mWeatherInfo);
-                Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
-                intent.putParcelableArrayListExtra(WeatherActivity.KEY_WEATHER, forecasts);
-                startActivity(intent);
+                startActivity(new Intent(MainActivity.this, WeatherActivity.class));
                 break;
             default:
                 break;
@@ -441,6 +446,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         if (info == null || info.getData() == null)
             return;
         mWeatherInfo = info;
+        WeatherSys.getInstance().setWeatherInfo(info);
         tvDrawerTitle.setText("今日天气");
         btnMore.setVisibility(View.VISIBLE);
         List<WeatherInfo.Data.Forecast> forecastList = info.getData().getForecast();
@@ -605,7 +611,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         }
         unregisterReceiver(mNetWorkReceiver);
         if (mLocationClient != null)
-            mLocationClient.unRegisterLocationListener(bdListener);
+            mLocationClient.unRegisterLocationListener(mBDListener);
     }
 
     public void showAlert(final int type) {
@@ -697,9 +703,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 break;
 
             case REQUEST_ASK_WEATHER:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && bdListener != null && bdListener.getCity() != null) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && mBDListener != null && mLocationInfo.getCity() != null) {
                     try {
-                        String c = URLEncoder.encode(bdListener.getCity(), "UTF-8");
+                        String c = URLEncoder.encode(mLocationInfo.getCity(), "UTF-8");
                         new WeatherTask(MainActivity.this).execute(URL + c);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -715,51 +721,22 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     }
 
     public class LocationListener implements BDLocationListener {
-        String address;    //获取详细地址信息
-        String country;    //获取国家
-        String province;    //获取省份
-        String city;    //获取城市
-        String district;    //获取区县
-        String street;    //获取街道信息
 
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            address = bdLocation.getAddrStr();    //获取详细地址信息
-            country = bdLocation.getCountry();    //获取国家
-            province = bdLocation.getProvince();    //获取省份
-            city = bdLocation.getCity();    //获取城市
-            district = bdLocation.getDistrict();    //获取区县
-            street = bdLocation.getStreet();    //获取街道信息
-            YLog.d("MainActivity", "地理位置 = " + city);
+            mLocationInfo.setAddress(bdLocation.getAddrStr());
+            mLocationInfo.setCountry(bdLocation.getCountry());
+            mLocationInfo.setProvince(bdLocation.getProvince());
+            mLocationInfo.setCity(bdLocation.getCity());
+            mLocationInfo.setDistrict(bdLocation.getDistrict());
+            mLocationInfo.setStreet(bdLocation.getStreet());
+            YLog.d("MainActivity", "地理位置 = " + mLocationInfo.getCity());
+            WeatherSys.getInstance().setLocationInfo(mLocationInfo);
             if (handler != null) {
-                Message msg = handler.obtainMessage(MESSAGE_LOCATION, city);
+                Message msg = handler.obtainMessage(MESSAGE_LOCATION, mLocationInfo.getCity());
                 msg.sendToTarget();
 
             }
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public String getCountry() {
-            return country;
-        }
-
-        public String getProvince() {
-            return province;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-        public String getDistrict() {
-            return district;
-        }
-
-        public String getStreet() {
-            return street;
         }
     }
 
