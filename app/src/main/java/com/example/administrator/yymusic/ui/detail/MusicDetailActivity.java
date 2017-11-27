@@ -7,7 +7,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,6 +26,8 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.ui.main.MainActivity;
+import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 
 import java.lang.ref.WeakReference;
@@ -35,21 +40,21 @@ import java.util.List;
  * @author yysleep
  */
 public class MusicDetailActivity extends BaseActivity {
+    private Toolbar mToolbar;
     private SeekBar seekBar;
     private TextView tvMaxTime;
     private TextView tvProgressTime;
-    private TextView tvSongTitle;
     private ProgressHandler handler;
-    boolean isGone;
+    private boolean isGone;
     private ImageView ivPlay;
     private ImageView ivCollect;
-    AlertDialog.Builder mDialog;
+    private AlertDialog.Builder mDialog;
     // 是否成功移除收藏
     boolean isRemove;
     boolean isLongClicking;
     boolean isFastToStop;
-    Thread thread;
-    MusicRunnable runnable;
+    private Thread thread;
+    private MusicRunnable runnable;
     private int mProgress;
     private MusicPlayer instance;
 
@@ -61,9 +66,7 @@ public class MusicDetailActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_music_dital);
-
-        init();
+        initLayout();
         runnable = new MusicRunnable();
         thread = new Thread(runnable);
         thread.start();
@@ -74,7 +77,42 @@ public class MusicDetailActivity extends BaseActivity {
         }
     }
 
-    public void init() {
+    private void initLayout() {
+        setContentView(R.layout.activity_music_dital);
+        mToolbar = findViewById(R.id.music_detail_tb);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                String msg = "";
+                switch (item.getItemId()) {
+                    case R.id.main_tool_menu_item_one:
+                        msg += "单曲循环模式";
+                        instance.setPlayMode(MusicConst.SINGLE_PLAY);
+                        break;
+                    case R.id.main_tool_menu_item_two:
+                        msg += "全部循环模式";
+                        instance.setPlayMode(MusicConst.SEQUENTIAL_PLAY);
+                        break;
+                    case R.id.main_tool_menu_item_three:
+                        msg += "随机播放模式";
+                        instance.setPlayMode(MusicConst.RANDOM_PLAY);
+                        break;
+                }
+
+                if (!msg.equals("")) {
+                    Toast.makeText(MusicDetailActivity.this, msg, Toast.LENGTH_SHORT).show();
+                }
+                ShareUtil.getInstance().savePlayModeInfo();
+                return true;
+            }
+        });
         instance = MusicPlayer.getInstance();
         ViewPager viewPager = (ViewPager) findViewById(R.id.music_detail_vp);
         if (viewPager != null) {
@@ -112,13 +150,12 @@ public class MusicDetailActivity extends BaseActivity {
         tvMaxTime = (TextView) findViewById(R.id.music_detil_alltime_tv);
         tvProgressTime = (TextView) findViewById(R.id.music_detil_progress_time_tv);
         ivPlay = (ImageView) findViewById(R.id.music_detil_play_tv);
-        tvSongTitle = (TextView) findViewById(R.id.music_detil_song_title_tv);
 
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null) {
-            tvSongTitle.setText(title);
+            mToolbar.setTitle(title);
         } else {
-            tvSongTitle.setText("开始选歌吧～");
+            mToolbar.setTitle("开始选歌吧～");
         }
 
         handler = new ProgressHandler(MusicDetailActivity.this);
@@ -222,7 +259,7 @@ public class MusicDetailActivity extends BaseActivity {
         } else if (instance.isPlaying()) {
             ivPlay.setImageResource(R.drawable.ic_music_stop);
             if (instance.getSongInfo() != null && instance.getSongTitle() != null)
-                tvSongTitle.setText(instance.getSongTitle());
+                mToolbar.setTitle(instance.getSongTitle());
 
         }
     }
@@ -287,7 +324,7 @@ public class MusicDetailActivity extends BaseActivity {
         YLog.i(TAG(), "[refreshInfo]" + info.toString());
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null)
-            tvSongTitle.setText(title);
+            mToolbar.setTitle(title);
 
         if (MusicPlayer.getInstance().checkIsCollcet()) {
             ivCollect.setImageResource(R.drawable.ic_music_detilc_collected);

@@ -52,7 +52,7 @@ public class CircularProgressView extends View {
             // 圆形宽度
             mPaint.setAntiAlias(true);
             // Color.rgb(0xe9, 0xe9, 0xe9)  默认颜色（未开始）
-            mPaint.setColor(Color.rgb(255, 255, 255));
+            mPaint.setColor(Color.rgb(222, 222, 222));
             canvas.drawColor(Color.TRANSPARENT);
             mPaint.setStrokeWidth(mCircleLineStrokeWidth);
             mPaint.setStyle(Paint.Style.STROKE);
@@ -65,10 +65,10 @@ public class CircularProgressView extends View {
         }
 
         // 设置进度颜
-        float left = (mCircleLineStrokeWidth / 2) + 2; // 左上角x
-        float top = (mCircleLineStrokeWidth / 2) + 2; // 左上角y
-        float right = (width - mCircleLineStrokeWidth / 2) - 2; // 左下角x
-        float bottom = (height - mCircleLineStrokeWidth / 2) - 2; // 右下角y
+        float left = (mCircleLineStrokeWidth / 2); // 左上角x
+        float top = (mCircleLineStrokeWidth / 2); // 左上角y
+        float right = (width - mCircleLineStrokeWidth / 2); // 左下角x
+        float bottom = (height - mCircleLineStrokeWidth / 2); // 右下角y
 
         mPaint.setColor(Color.rgb(0x67, 0xc8, 0xae));
         canvas.drawArc(left, top, right, bottom, -90, ((float) mProgress / mMaxProgress) * 360, false, mPaint);

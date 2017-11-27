@@ -26,8 +26,8 @@ public class LruCacheSys {
     private static LruCache<String, Bitmap> mMemoryCache;
     private static HashMap<String, ITaskInterface> mTaskMap;
     private static Map<String, SoftReference<Bitmap>> mSortReferenceCache;
-
     private Set<BitmapDownLoadTask> taskCollection;
+    private static Map<String, Bitmap> mCoverCache;
     private static Context mContext;
 
     private static final String TAG = "LruCacheSys";
@@ -43,6 +43,7 @@ public class LruCacheSys {
                     instance = new LruCacheSys();
                     mTaskMap = new HashMap<>();
                     mSortReferenceCache = new HashMap<>();
+                    mCoverCache = new HashMap<>();
                     int maxMemory = (int) Runtime.getRuntime().maxMemory();
                     int cacheSize = maxMemory / 8;
                     // 设置图片缓存大小为程序最大可用内存的1/8
@@ -70,7 +71,7 @@ public class LruCacheSys {
         mContext = appContext;
     }
 
-    public void registMusicObserver(String name, ITaskInterface task) {
+    public void registerMusicObserver(String name, ITaskInterface task) {
         if (name == null)
             return;
 
@@ -80,7 +81,7 @@ public class LruCacheSys {
         mTaskMap.put(name, task);
     }
 
-    public void unregisMusicObserver(String name) {
+    public void unRegisterMusicObserver(String name) {
         if (name == null)
             return;
 
@@ -104,9 +105,25 @@ public class LruCacheSys {
         return bmp;
     }
 
+    public Bitmap getBmpFromCoverCache(String key) {
+        if (key == null)
+            return null;
+        return mCoverCache.get(key);
+    }
+
     public void addBitmapToMemoryCache(String key, Bitmap bmp) {
         if (key != null && bmp != null && getBitmapFromMemoryCache(key) == null) {
             mMemoryCache.put(key, bmp);
+        }
+    }
+
+    // 缓存大图 只存一张
+    public void addCoverBmpCache(String key, Bitmap bmp) {
+        if (key == null || bmp == null)
+            return;
+        if (getBmpFromCoverCache(key) == null) {
+            mCoverCache.clear();
+            mCoverCache.put(key, bmp);
         }
     }
 
@@ -132,7 +149,10 @@ public class LruCacheSys {
         if (name == null || mTaskMap.get(name) == null || mContext == null)
             return;
 
-
+        if (getBmpFromCoverCache(url) != null) {
+            YLog.i(TAG, "[startTask] 已经有大图 Cover");
+            return;
+        }
         YLog.i(TAG, "[startTask] name = " + name + " url = " + url);
         BitmapDownLoadTask task = new BitmapDownLoadTask(mContext, type);
         if (taskCollection == null)

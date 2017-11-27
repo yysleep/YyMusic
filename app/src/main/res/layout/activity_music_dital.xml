@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/music_detil_song_title_tv"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/music_detail_tb"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:background="@color/musicTheme"
-        android:ellipsize="end"
-        android:gravity="bottom|center"
-        android:maxLines="1"
-        android:paddingBottom="6dp"
-        android:scrollHorizontally="true"
-        android:text="当前没有歌曲正在播放"
-        android:textColor="@color/white"
-        android:textSize="24sp" />
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/ToolbarPopupTheme">
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/music_detail_vp"

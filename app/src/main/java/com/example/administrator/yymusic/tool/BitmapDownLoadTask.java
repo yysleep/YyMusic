@@ -49,8 +49,10 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
 
         if (mT == Type.Thumbnails)
             LruCacheSys.getInstance().addBitmapToMemoryCache(params[1], bmp);
-        else
+        else {
+            LruCacheSys.getInstance().addCoverBmpCache(params[1], bmp);
             mBmpCover = bmp;
+        }
         return params;
     }
 
@@ -99,9 +101,16 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
 
         }
         options.inJustDecodeBounds = false;
-        options.inPreferredConfig  = Bitmap.Config.RGB_565;
-        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-        YLog.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp + " --- 大小 = " + bmp.getByteCount() );
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        Bitmap bmp = null;
+        try {
+            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        } catch (OutOfMemoryError error) {
+            YLog.i(TAG, "[createAlbumArts] 解析结束 OutOfMemoryError ");
+        }
+
+        if (bmp != null)
+            YLog.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp + " --- 大小 = " + bmp.getByteCount());
         return bmp;
     }
 

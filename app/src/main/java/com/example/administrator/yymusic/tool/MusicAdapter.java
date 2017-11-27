@@ -168,7 +168,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
     }
 
     public void clear() {
-        mLruCacheSys.unregisMusicObserver(this.toString());
+        mLruCacheSys.unRegisterMusicObserver(this.toString());
         mContext = null;
         mView = null;
         mLruCacheSys = null;

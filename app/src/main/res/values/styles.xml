@@ -10,18 +10,17 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat">
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-
         <item name="android:textColorPrimary">@color/white</item>
         <!-- Actionbar color -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <!--Status bar color-->
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <!--Window color-->
         <item name="android:windowBackground">@color/back</item>
+        <item name="android:colorControlNormal">@color/white</item>
 
         <!--<item name="colorAccent">@color/white</item>-->
 
@@ -51,6 +50,7 @@
     <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.Dark">
         <item name="android:colorBackground">@color/white</item>
         <item name="android:textColor">@color/lotWhite</item>
+        <item name="colorControlNormal">@color/white</item>
         <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
     </style>
 

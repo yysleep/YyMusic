@@ -50,14 +50,16 @@ public class MusicDetailCoverFragment extends BaseFragment {
         MusicInfo info = MusicPlayer.getInstance().getSongInfo();
         Bitmap bitmap = null;
         if (info != null) {
-            bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(info.getUrl());
-            LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
+            bitmap = LruCacheSys.getInstance().getBmpFromCoverCache(info.getUrl());
+            if (bitmap == null) {
+                bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(info.getUrl());
+                LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
+            }
         }
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
         else
             mCoverIv.setImageResource(R.drawable.icon_default_album_art);
-
 
     }
 
@@ -66,10 +68,14 @@ public class MusicDetailCoverFragment extends BaseFragment {
         if (info == null || info.getUpdateTitle() == null)
             return;
         YLog.i(TAG(), "[refreshInfo]" + info.toString());
-        Bitmap bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
+        Bitmap bitmap = LruCacheSys.getInstance().getBmpFromCoverCache(MusicPlayer.getInstance().getSongInfo().getUrl());
+        if (bitmap != null) {
+            mCoverIv.setImageBitmap(bitmap);
+            return;
+        }
+        bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
-
         YLog.i(TAG(), "[refreshInfo] bitmap = " + bitmap);
         LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
 
