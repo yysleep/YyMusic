@@ -96,7 +96,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     private BroadcastReceiver mNetWorkReceiver;
     static final int REQUEST_WRITE = 300;
     static final int REQUEST_READ = 301;
-    static final int REQUEST_INTENT = 302;
     static final int REQUEST_PHONE_STATE = 303;
     static final int REQUEST_LOCATION = 304;
     static final int REQUEST_ASK_WEATHER = 305;
@@ -148,9 +147,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             }).start();
         } else {
             showAlert(YYConstant.READ_PERMISSION);
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTENT);
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
@@ -231,34 +227,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         tvPower = findViewById(R.id.main_drawer_power_tv);
         tvDetail = findViewById(R.id.main_drawer_detail_tv);
         btnMore = findViewById(R.id.main_drawer_more_btn);
-//        ivPlayMode = (ImageView) findViewById(R.id.main_play_mode_iv);
 
-//        ivPlayMode.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                switch (MusicPlayer.getInstance().getPlayMode()) {
-//                    case MusicConst.SEQUENTIAL_PLAY:
-//                        MusicPlayer.getInstance().setPlayMode(MusicConst.RANDOM_PLAY);
-//                        ivPlayMode.setImageResource(R.drawable.ic_random_play);
-//                        break;
-//
-//                    case MusicConst.RANDOM_PLAY:
-//                        MusicPlayer.getInstance().setPlayMode(MusicConst.SINGLE_PLAY);
-//                        ivPlayMode.setImageResource(R.drawable.ic_single_play);
-//                        break;
-//
-//                    case MusicConst.SINGLE_PLAY:
-//                        MusicPlayer.getInstance().setPlayMode(MusicConst.SEQUENTIAL_PLAY);
-//                        ivPlayMode.setImageResource(R.drawable.ic_sequential_play);
-//                        break;
-//
-//                    default:
-//                        MusicPlayer.getInstance().setPlayMode(MusicConst.SEQUENTIAL_PLAY);
-//                        ivPlayMode.setImageResource(R.drawable.ic_sequential_play);
-//                        break;
-//                }
-//            }
-//        });
         handler = new MusicHandler(this);
         new Thread(new MusicThread()).start();
         initMode(ShareUtil.getInstance().getPlayMode());
@@ -524,17 +493,13 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         String city = (String) msg.obj;
                         if (city != null) {
                             activity.tvLocation.setText("当前城市：" + city);
-                            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
-                                String c = null;
-                                try {
-                                    c = URLEncoder.encode(city, "UTF-8");
-                                    new WeatherTask(activity).execute(URL + c);
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                    LogHelper.d("MainActivity", "[handleMessage]城市文字转化异常");
-                                }
-                            } else {
-                                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.INTERNET}, REQUEST_ASK_WEATHER);
+                            String c = null;
+                            try {
+                                c = URLEncoder.encode(city, "UTF-8");
+                                new WeatherTask(activity).execute(URL + c);
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                                LogHelper.d("MainActivity", "[handleMessage]城市文字转化异常");
                             }
                         } else
                             activity.tvDrawerTitle.setText("网络异常，无法获取天气");
@@ -699,11 +664,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取删除权限失败");
                     Toast.makeText(MainActivity.this, "获取删除权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
                 }
-                break;
-
-            case REQUEST_INTENT:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取网络权限成功");
                 break;
 
             case REQUEST_LOCATION:

@@ -31,24 +31,16 @@ import java.io.File;
  */
 public class MusicApplication extends Application {
 
-    public static int length;
-
     private static final String TAG = "MusicApplication";
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         initStorage();
         MusicDBMgr.getInstance().init(this);
         LruCacheSys.getInstance().initContext(getApplicationContext());
-        length = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth() / 2;
-
-        // MusicSys.getInstance().initMusicList(getApplicationContext());
-
         // 注册观察者
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, new MusicObserver(null));
-
         ShareUtil.getInstance().init(getApplicationContext());
     }
 
@@ -92,7 +84,6 @@ public class MusicApplication extends Application {
     }
 
     private boolean initStorage() {
-
         // 图片存储路径
         String imagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yymusic/album/";
         File fileImage = new File(imagePath);
@@ -101,7 +92,6 @@ public class MusicApplication extends Application {
                 return false;
             }
         }
-
         return true;
     }
 
