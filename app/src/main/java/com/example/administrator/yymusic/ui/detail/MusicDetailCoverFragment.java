@@ -15,7 +15,7 @@ import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.tool.BitmapDownLoadTask;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
-import com.example.administrator.yymusic.util.YLog;
+import com.example.administrator.yymusic.util.LogHelper;
 
 /**
  * Created by  on 17-6-9.
@@ -67,7 +67,7 @@ public class MusicDetailCoverFragment extends BaseFragment {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
-        YLog.i(TAG(), "[refreshInfo]" + info.toString());
+        LogHelper.i(TAG(), "[refreshInfo]" + info.toString());
         Bitmap bitmap = LruCacheSys.getInstance().getBmpFromCoverCache(MusicPlayer.getInstance().getSongInfo().getUrl());
         if (bitmap != null) {
             mCoverIv.setImageBitmap(bitmap);
@@ -76,7 +76,7 @@ public class MusicDetailCoverFragment extends BaseFragment {
         bitmap = LruCacheSys.getInstance().getBitmapFromMemoryCache(MusicPlayer.getInstance().getSongInfo().getUrl());
         if (bitmap != null)
             mCoverIv.setImageBitmap(bitmap);
-        YLog.i(TAG(), "[refreshInfo] bitmap = " + bitmap);
+        LogHelper.i(TAG(), "[refreshInfo] bitmap = " + bitmap);
         LruCacheSys.getInstance().startTask(TAG(), info.getUrl(), BitmapDownLoadTask.Type.Cover);
 
 

@@ -13,7 +13,7 @@ import com.example.administrator.yymusic.dao.FavoriteDao;
 import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.util.ShareUtil;
-import com.example.administrator.yymusic.util.YLog;
+import com.example.administrator.yymusic.util.LogHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,7 +168,7 @@ public class MusicSys {
                     firstInit = false;
                     outsideInit = false;
                 }
-                YLog.i("yymusic", "[initMusicList] 本地music 数据 musicInfo = " + musicInfo);
+                LogHelper.i("yymusic", "[initMusicList] 本地music 数据 musicInfo = " + musicInfo);
                 localMusics.add(musicInfo);
             } while (cursor.moveToNext());
         } finally {

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
-import com.example.administrator.yymusic.util.YLog;
+import com.example.administrator.yymusic.util.LogHelper;
 
 /**
  * Created by archermind on 17-6-9.
@@ -48,7 +48,7 @@ public class MusicDetailLyricsFragment extends BaseFragment {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
-        YLog.i(TAG(), "[refreshInfo]" + info.toString());
+        LogHelper.i(TAG(), "[refreshInfo]" + info.toString());
 
 
     }

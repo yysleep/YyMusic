@@ -8,7 +8,7 @@ import android.util.Log;
  * @author yysleep
  */
 
-public class YLog {
+public class LogHelper {
 
     private static final boolean DEBUG = true;
 

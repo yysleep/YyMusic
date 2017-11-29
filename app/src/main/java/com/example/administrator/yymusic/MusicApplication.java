@@ -18,8 +18,8 @@ import com.example.administrator.yymusic.sys.LruCacheSys;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.FileOperationTask;
+import com.example.administrator.yymusic.util.LogHelper;
 import com.example.administrator.yymusic.util.ShareUtil;
-import com.example.administrator.yymusic.util.YLog;
 
 import java.io.File;
 
@@ -69,20 +69,20 @@ public class MusicApplication extends Application {
             super.onChange(selfChange);
 
             if (FileOperationTask.sIsOurSelfDelete) {
-                YLog.i(TAG, "[MusicObserver][onChange] 第一次数据库发生了变化 为 yymusic 自身删除 ...");
+                LogHelper.i(TAG, "[MusicObserver][onChange] 第一次数据库发生了变化 为 yymusic 自身删除 ...");
                 FileOperationTask.sIsOurSelfDelete = false;
                 return;
             }
             if (FileOperationTask.sAutoSync) {
-                YLog.i(TAG, "[MusicObserver][onChange] 第二次数据库发生了变化 为 yymusic 自身删除 ...");
+                LogHelper.i(TAG, "[MusicObserver][onChange] 第二次数据库发生了变化 为 yymusic 自身删除 ...");
                 FileOperationTask.sAutoSync = false;
                 return;
             }
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 但是没有读取权限");
+                LogHelper.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 但是没有读取权限");
                 return;
             }
-            YLog.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 正在刷新本地数据 ...");
+            LogHelper.i(TAG, "[MusicObserver][onChange] 数据库发生了变化 正在刷新本地数据 ...");
             MusicSys.getInstance().initMusicList(getApplicationContext(), false, true);
             MusicPlayer.getInstance().update();
             Intent intent = new Intent(MusicConst.ACTION_UPDATE_ALL_MUSIC_LIST);

@@ -59,7 +59,7 @@ public class ShareUtil {
         if (titile == null) {
             titile = "快去听歌吧";
         }
-        YLog.i("ShareUtil", "[saveSongInfo] title = " + titile);
+        LogHelper.i("ShareUtil", "[saveSongInfo] title = " + titile);
         int currentPosition = instance.getMediaPlayer().getCurrentPosition();
         int max = instance.getMediaPlayer().getDuration();
         int progress = (int) ((float) currentPosition * 100 / max);

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.sys.LruCacheSys;
-import com.example.administrator.yymusic.util.YLog;
+import com.example.administrator.yymusic.util.LogHelper;
 
 import java.util.List;
 
@@ -114,7 +114,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
         if (musicInfos.size() <= 0)
             return;
 
-        YLog.i(TAG, "[onScrollStateChanged] scrollState = " + scrollState);
+        LogHelper.i(TAG, "[onScrollStateChanged] scrollState = " + scrollState);
         if (scrollState == SCROLL_STATE_IDLE) {
             startTask();
         } else {
@@ -130,7 +130,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         mFristVisibleItem = firstVisibleItem;
         mVisibleCount = visibleItemCount;
-        // YLog.i(TAG, "[onScroll] firstVisibleItem = " + firstVisibleItem + " visibleItemCount = " + visibleItemCount);
+        // LogHelper.i(TAG, "[onScroll] firstVisibleItem = " + firstVisibleItem + " visibleItemCount = " + visibleItemCount);
         if (isFristEnter && mVisibleCount != 0) {
             startTask();
             isFristEnter = false;
@@ -141,7 +141,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
         if (getCount() == 0)
             return;
 
-        YLog.i(TAG, "[startTask] musicInfos.size = " + musicInfos.size());
+        LogHelper.i(TAG, "[startTask] musicInfos.size = " + musicInfos.size());
         for (int i = mFristVisibleItem; i < mFristVisibleItem + mVisibleCount; i++) {
             if (i >= musicInfos.size())
                 return;
@@ -157,10 +157,10 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
 
     public void downLoadSuccess(String url) {
         if (url != null) {
-            YLog.i(TAG, "[downLoadSuccess] url = " + url);
+            LogHelper.i(TAG, "[downLoadSuccess] url = " + url);
             ImageView iv = (ImageView) mView.findViewWithTag(url);
             if (iv == null) {
-                YLog.i(TAG, "[downLoadSuccess] iv is null ");
+                LogHelper.i(TAG, "[downLoadSuccess] iv is null ");
                 return;
             }
             setImageView(url, iv);
