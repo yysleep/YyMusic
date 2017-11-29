@@ -8,8 +8,8 @@ package com.example.administrator.yymusic.api;
 
 public interface IFileOperationCallback {
 
-    public void refreshDeleteFile(Boolean result);
+    void refreshDeleteFile(Boolean result);
 
-    public void syncList(String path);
+    void syncList(String path);
 
 }

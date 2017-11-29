@@ -2,6 +2,7 @@ package com.example.administrator.yymusic.model;
 
 /**
  * Created by Administrator on 2017/11/9.
+ * @author yysleep
  */
 
 public class LocationInfo {

@@ -23,12 +23,12 @@ public class LruCacheSys {
 
     private static volatile LruCacheSys instance;
 
-    private static LruCache<String, Bitmap> mMemoryCache;
-    private static HashMap<String, ITaskInterface> mTaskMap;
-    private static Map<String, SoftReference<Bitmap>> mSortReferenceCache;
+    private static LruCache<String, Bitmap> sMemoryCache;
+    private static HashMap<String, ITaskInterface> sTaskMap;
+    private static Map<String, SoftReference<Bitmap>> sSortReferenceCache;
     private Set<BitmapDownLoadTask> taskCollection;
-    private static Map<String, Bitmap> mCoverCache;
-    private static Context mContext;
+    private static Map<String, Bitmap> sCoverCache;
+    private static Context sContext;
 
     private static final String TAG = "LruCacheSys";
 
@@ -41,13 +41,13 @@ public class LruCacheSys {
             synchronized (LruCacheSys.class) {
                 if (instance == null) {
                     instance = new LruCacheSys();
-                    mTaskMap = new HashMap<>();
-                    mSortReferenceCache = new HashMap<>();
-                    mCoverCache = new HashMap<>();
+                    sTaskMap = new HashMap<>();
+                    sSortReferenceCache = new HashMap<>();
+                    sCoverCache = new HashMap<>();
                     int maxMemory = (int) Runtime.getRuntime().maxMemory();
                     int cacheSize = maxMemory / 8;
                     // 设置图片缓存大小为程序最大可用内存的1/8
-                    mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+                    sMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
                         @Override
                         protected int sizeOf(String key, Bitmap bitmap) {
                             return bitmap.getByteCount();
@@ -57,7 +57,7 @@ public class LruCacheSys {
                         protected void entryRemoved(boolean evicted, String key, Bitmap oldValue, Bitmap newValue) {
                             if (oldValue != null) {
                                 SoftReference<Bitmap> s = new SoftReference<Bitmap>(oldValue);
-                                mSortReferenceCache.put(key, s);
+                                sSortReferenceCache.put(key, s);
                             }
                         }
                     };
@@ -68,62 +68,71 @@ public class LruCacheSys {
     }
 
     public void initContext(Context appContext) {
-        mContext = appContext;
+        sContext = appContext;
     }
 
     public void registerMusicObserver(String name, ITaskInterface task) {
         if (name == null)
             return;
 
-        if (mTaskMap.containsKey(name))
+        if (sTaskMap.containsKey(name))
             return;
 
-        mTaskMap.put(name, task);
+        sTaskMap.put(name, task);
     }
 
     public void unRegisterMusicObserver(String name) {
         if (name == null)
             return;
 
-        if (mTaskMap.containsKey(name))
-            mTaskMap.remove(name);
+        if (sTaskMap.containsKey(name))
+            sTaskMap.remove(name);
 
     }
 
     public Bitmap getBitmapFromMemoryCache(String key) {
         if (key == null)
             return null;
-        Bitmap bmp = mMemoryCache.get(key);
+        Bitmap bmp = sMemoryCache.get(key);
         if (bmp == null) {
-            SoftReference<Bitmap> s = mSortReferenceCache.get(key);
+            SoftReference<Bitmap> s = sSortReferenceCache.get(key);
             if (s != null) {
                 bmp = s.get();
                 if (bmp != null)
-                    mMemoryCache.put(key, bmp);
+                    sMemoryCache.put(key, bmp);
             }
         }
         return bmp;
     }
 
+    /*
+    * 获取唯一的一张大图缓存
+    * @param key string 图片的路径
+    * @return 大图 bitmap
+    **/
     public Bitmap getBmpFromCoverCache(String key) {
         if (key == null)
             return null;
-        return mCoverCache.get(key);
+        return sCoverCache.get(key);
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bmp) {
         if (key != null && bmp != null && getBitmapFromMemoryCache(key) == null) {
-            mMemoryCache.put(key, bmp);
+            sMemoryCache.put(key, bmp);
         }
     }
 
-    // 缓存大图 只存一张
+    /*
+    * 添加缓存大图(只存一张)
+    * @param key string 图片的url
+    * @param bmp Bitmap 位图
+    **/
     public void addCoverBmpCache(String key, Bitmap bmp) {
         if (key == null || bmp == null)
             return;
         if (getBmpFromCoverCache(key) == null) {
-            mCoverCache.clear();
-            mCoverCache.put(key, bmp);
+            sCoverCache.clear();
+            sCoverCache.put(key, bmp);
         }
     }
 
@@ -131,7 +140,7 @@ public class LruCacheSys {
         if (params.length < 2 || params[0] == null || params[1] == null)
             return;
 
-        ITaskInterface task = mTaskMap.get(params[0]);
+        ITaskInterface task = sTaskMap.get(params[0]);
         if (task == null)
             return;
 
@@ -144,9 +153,9 @@ public class LruCacheSys {
     }
 
     public void startTask(String name, String url, BitmapDownLoadTask.Type type) {
-        YLog.i(TAG, "[startTask] name = " + name + " mTaskMap.get(name) = " + mTaskMap.get(name) +
+        YLog.i(TAG, "[startTask] name = " + name + " sTaskMap.get(name) = " + sTaskMap.get(name) +
                 "   getBitmapFromMemoryCache(url) = " + getBitmapFromMemoryCache(url) + "  url = " + url);
-        if (name == null || mTaskMap.get(name) == null || mContext == null)
+        if (name == null || sTaskMap.get(name) == null || sContext == null)
             return;
 
         if (getBmpFromCoverCache(url) != null) {
@@ -154,7 +163,7 @@ public class LruCacheSys {
             return;
         }
         YLog.i(TAG, "[startTask] name = " + name + " url = " + url);
-        BitmapDownLoadTask task = new BitmapDownLoadTask(mContext, type);
+        BitmapDownLoadTask task = new BitmapDownLoadTask(sContext, type);
         if (taskCollection == null)
             taskCollection = new HashSet<>();
 

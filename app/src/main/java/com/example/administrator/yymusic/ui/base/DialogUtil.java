@@ -18,19 +18,19 @@ import com.example.administrator.yymusic.R;
  */
 public class DialogUtil extends Dialog implements View.OnClickListener {
     private OnClickDialogListener listener;
-    TextView tvTitle;
-    Button btnOne;
-    Button btnTwo;
+    private TextView mTvTitle;
+    private Button mBtnOne;
+    private Button mBtnTwo;
 
     public DialogUtil(Context context, OnClickDialogListener listener) {
         super(context,R.style.Theme_AudioDialog);
         this.listener = listener;
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_music, null);
-        tvTitle = (TextView) view.findViewById(R.id.dialog_title_tv);
-        btnOne = (Button) view.findViewById(R.id.dialog_one_btn);
-        btnTwo = (Button) view.findViewById(R.id.dialog_two_btn);
-        btnOne.setOnClickListener(this);
-        btnTwo.setOnClickListener(this);
+        mTvTitle = (TextView) view.findViewById(R.id.dialog_title_tv);
+        mBtnOne = (Button) view.findViewById(R.id.dialog_one_btn);
+        mBtnTwo = (Button) view.findViewById(R.id.dialog_two_btn);
+        mBtnOne.setOnClickListener(this);
+        mBtnTwo.setOnClickListener(this);
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         getWindow().setGravity(Gravity.BOTTOM);

@@ -9,7 +9,7 @@ import android.graphics.Bitmap;
  */
 public interface ITaskInterface {
 
-    public void getBmpSuccess(Bitmap bmp, String url);
+    void getBmpSuccess(Bitmap bmp, String url);
 
-    public void getBmpFailed();
+    void getBmpFailed();
 }

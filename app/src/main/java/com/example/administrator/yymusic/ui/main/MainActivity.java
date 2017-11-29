@@ -360,17 +360,17 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     instance.continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
                     isContinue = false;
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                     return;
                 }
                 if (instance.isPlaying()) {
                     instance.pause();
                     ivPlay.setImageResource(R.drawable.ic_music_play);
-                    MusicPlayer.isPauseByMyself = true;
+                    MusicPlayer.sIsPauseByMyself = true;
                 } else if (instance.isStarted()) {
                     MusicPlayer.getInstance().continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 } else {
                     Toast.makeText(this, " 请选择一首歌曲吧", Toast.LENGTH_LONG).show();
                 }
@@ -389,7 +389,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
                 if (instance.isPlaying()) {
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 }
                 instance.nextMusic();
                 break;

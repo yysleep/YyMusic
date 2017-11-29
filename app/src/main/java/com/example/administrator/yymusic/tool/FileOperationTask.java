@@ -4,14 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-import com.example.administrator.yymusic.MusicApplication;
 import com.example.administrator.yymusic.api.IFileOperationCallback;
-import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
-import com.example.administrator.yymusic.ui.main.MusicLocalFragment;
 
 import java.io.File;
 
@@ -24,9 +20,9 @@ import java.io.File;
 public class FileOperationTask extends AsyncTask<String, Void, Boolean> {
 
     private IFileOperationCallback callback;
-    public static boolean isOurSelfDelete;
-    public static boolean autoSync;
-    public static boolean checkSelf;
+    public static boolean sIsOurSelfDelete;
+    public static boolean sAutoSync;
+    public static boolean sCheckSelf;
 
     public FileOperationTask(IFileOperationCallback callback) {
         this.callback = callback;
@@ -58,8 +54,8 @@ public class FileOperationTask extends AsyncTask<String, Void, Boolean> {
 
                 File file = new File(task[1]);
                 if (file.exists()) {
-                    isOurSelfDelete = true;
-                    autoSync = true;
+                    sIsOurSelfDelete = true;
+                    sAutoSync = true;
                     if (file.delete()) {
                         // 在对文件进行删除或保存后，需要对系统进行更新，是通过广播的形式来完成
                         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);

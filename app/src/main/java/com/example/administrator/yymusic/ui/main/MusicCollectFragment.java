@@ -100,7 +100,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
                     }
 
                     MusicPlayer.getInstance().startMusic(mActivity.getApplicationContext(), i, 1);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 }
             });
             lvMusic.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

@@ -59,11 +59,14 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
     @Override
     protected void onPostExecute(String[] params) {
         super.onPostExecute(params);
-        if (params == null || params.length <= 0)
+        if (params == null || params.length <= 0) {
+            mContext = null;
             return;
+        }
         YLog.i(TAG, "[onPostExecute] name = " + params[0] + " mBmpCover = " + mBmpCover);
         LruCacheSys.getInstance().refresh(mT, mBmpCover, params);
         mBmpCover = null;
+        mContext = null;
 
     }
 

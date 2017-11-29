@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.example.administrator.yymusic.common.MusicConst;
@@ -69,14 +68,14 @@ public class MusicApplication extends Application {
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
 
-            if (FileOperationTask.isOurSelfDelete) {
+            if (FileOperationTask.sIsOurSelfDelete) {
                 YLog.i(TAG, "[MusicObserver][onChange] 第一次数据库发生了变化 为 yymusic 自身删除 ...");
-                FileOperationTask.isOurSelfDelete = false;
+                FileOperationTask.sIsOurSelfDelete = false;
                 return;
             }
-            if (FileOperationTask.autoSync) {
+            if (FileOperationTask.sAutoSync) {
                 YLog.i(TAG, "[MusicObserver][onChange] 第二次数据库发生了变化 为 yymusic 自身删除 ...");
-                FileOperationTask.autoSync = false;
+                FileOperationTask.sAutoSync = false;
                 return;
             }
             if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

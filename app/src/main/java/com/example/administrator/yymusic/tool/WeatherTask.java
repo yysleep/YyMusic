@@ -15,6 +15,7 @@ import okhttp3.Response;
 
 /**
  * Created by yysleep on 17-10-19.
+ * @author yysleep
  */
 
 public class WeatherTask extends AsyncTask<String, Void, WeatherInfo> {

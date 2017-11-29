@@ -8,5 +8,5 @@ import com.example.administrator.yymusic.model.UpdateInfo;
  */
 public interface ITaskCallback {
 
-    public void refreshInfo(UpdateInfo info);
+    void refreshInfo(UpdateInfo info);
 }

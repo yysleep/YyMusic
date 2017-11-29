@@ -24,7 +24,7 @@ public class NotificationSys {
 
     private static final String LOG_TAG = "NotificationSys";
     private static final String mChannelId = "yymusic";
-    static final int NOTIFICATION_ID = 1011;
+    private static final int NOTIFICATION_ID = 1011;
 
     private Notification.Builder mBuilder;
     private Notification mNotification;

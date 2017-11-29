@@ -26,7 +26,6 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
-import com.example.administrator.yymusic.ui.main.MainActivity;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 
@@ -274,7 +273,7 @@ public class MusicDetailActivity extends BaseActivity {
                 if (!MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 }
                 MusicPlayer.getInstance().lastMusic();
                 break;
@@ -283,11 +282,11 @@ public class MusicDetailActivity extends BaseActivity {
                 if (MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().pause();
                     ivPlay.setImageResource(R.drawable.ic_music_play);
-                    MusicPlayer.isPauseByMyself = true;
+                    MusicPlayer.sIsPauseByMyself = true;
                 } else {
                     MusicPlayer.getInstance().continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
 
                 }
 
@@ -297,7 +296,7 @@ public class MusicDetailActivity extends BaseActivity {
                 if (!MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().getMediaPlayer().start();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 }
                 MusicPlayer.getInstance().nextMusic();
                 break;

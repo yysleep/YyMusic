@@ -32,7 +32,6 @@ import com.example.administrator.yymusic.tool.FileOperationTask;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
-import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.util.YLog;
 import com.example.administrator.yymusic.util.YYConstant;
 
@@ -98,7 +97,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                     }
 
                     MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 0);
-                    MusicPlayer.isPauseByMyself = false;
+                    MusicPlayer.sIsPauseByMyself = false;
                 }
             });
 

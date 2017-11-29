@@ -7,6 +7,7 @@ import android.os.Parcelable;
 /**
  * 音乐
  * Created by Administrator on 2016/5/22.
+ * @author yysleep
  */
 public class MusicInfo extends YMBaseModel implements Parcelable {
 
