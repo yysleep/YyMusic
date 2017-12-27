@@ -118,7 +118,7 @@ public class MusicDetailActivity extends BaseActivity {
             viewPager.setAdapter(new TapPagerAdapter(getSupportFragmentManager(), getFragments(), false));
             viewPager.setCurrentItem(0);
         }
-        mDialog = new AlertDialog.Builder(this);
+        mDialog = new AlertDialog.Builder(this, R.style.YMAlertDialogStyle);
         mDialog.setTitle("是否取消收藏")
                 .setMessage("   ")
                 .setNegativeButton("取消", null)

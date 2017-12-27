@@ -60,8 +60,15 @@
 
     <style name="YMSeekbarStyle" parent="Base.Widget.AppCompat.SeekBar">
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
-
+    <style name="YMAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <!-- Used for the background -->
+        <item name="android:background">#FFFFFF</item>
     </style>
 
 </resources>

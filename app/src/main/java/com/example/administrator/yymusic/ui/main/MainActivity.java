@@ -595,7 +595,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     }
 
     public void showAlert(final int type) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this).
+        AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.YMAlertDialogStyle).
                 setTitle("权限说明").
                 setMessage("开启访问音频文件的权限").
                 setIcon(R.mipmap.icon_yymusic_launcher).
