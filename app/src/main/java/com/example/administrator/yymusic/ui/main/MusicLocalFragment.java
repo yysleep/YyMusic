@@ -107,7 +107,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                     mInfo = (MusicInfo) parent.getAdapter().getItem(position);
                     if (mInfo != null && position >= 0) {
                         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            ((MainActivity) getActivity()).showAlert(YYConstant.WRITE_PERMISSON);
+                            ((MainActivity) getActivity()).showAlert(YYConstant.READ_PERMISSION);
                         } else {
                             showAlert(position);
                         }

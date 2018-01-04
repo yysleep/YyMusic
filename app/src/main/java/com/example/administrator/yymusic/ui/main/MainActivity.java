@@ -94,7 +94,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     private LocationClientOption mOption;
 
     private BroadcastReceiver mNetWorkReceiver;
-    static final int REQUEST_WRITE = 300;
     static final int REQUEST_READ = 301;
     static final int REQUEST_PHONE_STATE = 303;
     static final int REQUEST_LOCATION = 304;
@@ -153,13 +152,12 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_PHONE_STATE);
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (mWeatherInfo == null)
                 mLocationClient.start();
             LogHelper.d(TAG(), "[checkPermission] 获取位置权限成功, 开始获取地理位置");
         } else
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
     }
 
     void initToolBar() {
@@ -507,14 +505,13 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
                     case MESSAGE_NETWORK_CHANGE:
                         LogHelper.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] ");
-                        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                                ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             if (activity.mWeatherInfo == null) {
                                 activity.mLocationClient.start();
                                 LogHelper.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] 获取位置");
                             }
                         } else
-                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
                         break;
                     default:
                         break;
@@ -609,11 +606,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                                 LogHelper.d(TAG(), "[showAlert] 正在申请读取权限");
                                 break;
 
-                            case YYConstant.WRITE_PERMISSON:
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE);
-                                LogHelper.d(TAG(), "[showAlert] 正在申请删除权限");
-                                break;
-
                             default:
                                 break;
                         }
@@ -655,16 +647,6 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取读取权限失败");
                     Toast.makeText(MainActivity.this, "获取读取权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
                 }
-
-            case REQUEST_WRITE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 已经拥有删除权限");
-                    Toast.makeText(MainActivity.this, "已获得删除权限", Toast.LENGTH_LONG).show();
-                } else {
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取删除权限失败");
-                    Toast.makeText(MainActivity.this, "获取删除权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
-                }
-                break;
 
             case REQUEST_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
