@@ -30,7 +30,7 @@ import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 /**
  * Created by Administrator on 2016/5/25.
@@ -74,7 +74,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
         mActivity = getActivity();
         if (mActivity != null)
             initView();
-        LogHelper.d(TAG(), "[onCreateView] ");
+        LogUtil.d(TAG(), "[onCreateView] ");
         return view;
     }
 
@@ -179,7 +179,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        LogHelper.d(TAG(), "[showAlert] info = " + info);
+                        LogUtil.d(TAG(), "[showAlert] info = " + info);
                         if (info.getIsPlaying() == 1) {
                             Toast.makeText(MusicCollectFragment.this.getActivity(), "无法移除正在播放的歌曲", Toast.LENGTH_SHORT).show();
                             return;
@@ -188,7 +188,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
                         MusicDBMgr.getInstance().delete(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
                         if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_COLLECT) {
                             MusicPlayer.getInstance().refreshList(mPosition);
-                            LogHelper.d(TAG(), "[showAlert] 当前列表为 收藏列表");
+                            LogUtil.d(TAG(), "[showAlert] 当前列表为 收藏列表");
                         }
                         musicApapter.notifyDataSetChanged();
 
@@ -230,7 +230,7 @@ public class MusicCollectFragment extends BaseFragment implements ITaskInterface
             MusicDBMgr.getInstance().delete(FavoriteDao.TABLE_FAVORITE_MUSIC, info);
             if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_COLLECT) {
                 MusicPlayer.getInstance().refreshList(mPosition);
-                LogHelper.d(TAG(), "[syncList] 当前列表为 收藏列表");
+                LogUtil.d(TAG(), "[syncList] 当前列表为 收藏列表");
             }
             musicApapter.notifyDataSetChanged();
         }

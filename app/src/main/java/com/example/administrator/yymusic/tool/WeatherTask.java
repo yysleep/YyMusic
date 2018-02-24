@@ -3,7 +3,7 @@ package com.example.administrator.yymusic.tool;
 import android.os.AsyncTask;
 
 import com.example.administrator.yymusic.model.WeatherInfo;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class WeatherTask extends AsyncTask<String, Void, WeatherInfo> {
             }
             if (json == null)
                 return null;
-            LogHelper.d(TAG, "[doInBackground] response = " + json);
+            LogUtil.d(TAG, "[doInBackground] response = " + json);
             Gson gson = new Gson();
             WeatherInfo info = gson.fromJson(json, WeatherInfo.class);
             if (info != null)

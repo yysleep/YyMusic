@@ -6,7 +6,7 @@ import android.support.v4.util.LruCache;
 
 import com.example.administrator.yymusic.api.ITaskInterface;
 import com.example.administrator.yymusic.tool.BitmapDownLoadTask;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -144,7 +144,7 @@ public class LruCacheSys {
         if (task == null)
             return;
 
-        LogHelper.i(TAG, "[refresh] name = " + params[0]);
+        LogUtil.i(TAG, "[refresh] name = " + params[0]);
         if (t == BitmapDownLoadTask.Type.Cover || getBitmapFromMemoryCache(params[1]) != null)
             task.getBmpSuccess(cover, params[1]);
         else
@@ -153,16 +153,16 @@ public class LruCacheSys {
     }
 
     public void startTask(String name, String url, BitmapDownLoadTask.Type type) {
-        LogHelper.i(TAG, "[startTask] name = " + name + " sTaskMap.get(name) = " + sTaskMap.get(name) +
+        LogUtil.i(TAG, "[startTask] name = " + name + " sTaskMap.get(name) = " + sTaskMap.get(name) +
                 "   getBitmapFromMemoryCache(url) = " + getBitmapFromMemoryCache(url) + "  url = " + url);
         if (name == null || sTaskMap.get(name) == null || sContext == null)
             return;
 
         if (getBmpFromCoverCache(url) != null) {
-            LogHelper.i(TAG, "[startTask] 已经有大图 Cover");
+            LogUtil.i(TAG, "[startTask] 已经有大图 Cover");
             return;
         }
-        LogHelper.i(TAG, "[startTask] name = " + name + " url = " + url);
+        LogUtil.i(TAG, "[startTask] name = " + name + " url = " + url);
         BitmapDownLoadTask task = new BitmapDownLoadTask(sContext, type);
         if (taskCollection == null)
             taskCollection = new HashSet<>();

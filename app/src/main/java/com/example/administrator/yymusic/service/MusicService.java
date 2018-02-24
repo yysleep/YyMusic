@@ -11,8 +11,8 @@ import com.example.administrator.yymusic.model.UpdateInfo;
 import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.sys.NotificationSys;
+import com.example.administrator.yymusic.util.LogUtil;
 import com.example.administrator.yymusic.util.ShareUtil;
-import com.example.administrator.yymusic.util.LogHelper;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class MusicService extends Service implements ITaskCallback {
     public void onCreate() {
         super.onCreate();
         instance=MusicPlayer.getInstance();
-        LogHelper.i(TAG, "[onCreate]");
+        LogUtil.i(TAG, "[onCreate]");
         MusicPlayer.getInstance().registMusicObserver(TAG, this);
         musicInfos = MusicSys.getInstance().getLocalMusics();
         notificationSys = NotificationSys.getInstance();
@@ -52,7 +52,7 @@ public class MusicService extends Service implements ITaskCallback {
         notificationSys.onDestroy(this);
         MusicPlayer.getInstance().unregisMusicObserver(TAG);
         MusicPlayer.getInstance().onDestroy();
-        LogHelper.i(TAG, "[onDestroy]" );
+        LogUtil.i(TAG, "[onDestroy]" );
         super.onDestroy();
     }
 
@@ -64,7 +64,7 @@ public class MusicService extends Service implements ITaskCallback {
         if (musicInfos != null && musicInfos.size() > 0) {
             int position = info.getUpdatePosition();
             int fragmentNum = info.getUpdateFragmentNum();
-            LogHelper.i(TAG, "[refreshInfo] position = " + position + " fragmentNum = " + fragmentNum);
+            LogUtil.i(TAG, "[refreshInfo] position = " + position + " fragmentNum = " + fragmentNum);
             notificationSys.notify(info.getUpdateTitle());
         }
 

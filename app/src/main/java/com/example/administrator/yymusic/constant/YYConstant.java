@@ -1,4 +1,4 @@
-package com.example.administrator.yymusic.util;
+package com.example.administrator.yymusic.constant;
 
 /**
  * Created by archermind on 17-9-6.

@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 import android.view.WindowManager;
 
 import com.example.administrator.yymusic.sys.LruCacheSys;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 /**
  * Created by archermind on 17-6-8.
@@ -61,7 +61,7 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
             mContext = null;
             return;
         }
-        LogHelper.i(TAG, "[onPostExecute] name = " + params[0] + " mBmpCover = " + mBmpCover);
+        LogUtil.i(TAG, "[onPostExecute] name = " + params[0] + " mBmpCover = " + mBmpCover);
         LruCacheSys.getInstance().refresh(mT, mBmpCover, params);
         mBmpCover = null;
         mContext = null;
@@ -71,12 +71,12 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
     private Bitmap createAlbumArts(String filePath) {
         if (filePath == null)
             return null;
-        LogHelper.i(TAG, "[createAlbumArts] filePath = " + filePath);
+        LogUtil.i(TAG, "[createAlbumArts] filePath = " + filePath);
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         try {
             retriever.setDataSource(filePath);
         } catch (Exception e) {
-            LogHelper.e(TAG, "[createAlbumArts] filePath = " + filePath + " 解析地址出错");
+            LogUtil.e(TAG, "[createAlbumArts] filePath = " + filePath + " 解析地址出错");
             return null;
         }
         byte[] bytes = retriever.getEmbeddedPicture();
@@ -107,11 +107,11 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
         try {
             bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
         } catch (OutOfMemoryError error) {
-            LogHelper.i(TAG, "[createAlbumArts] 解析结束 OutOfMemoryError ");
+            LogUtil.i(TAG, "[createAlbumArts] 解析结束 OutOfMemoryError ");
         }
 
         if (bmp != null)
-            LogHelper.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp + " --- 大小 = " + bmp.getByteCount());
+            LogUtil.i(TAG, "[createAlbumArts] 解析结束 bmp = " + bmp + " --- 大小 = " + bmp.getByteCount());
         return bmp;
     }
 

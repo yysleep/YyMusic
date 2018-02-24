@@ -47,8 +47,8 @@ import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.tool.WeatherTask;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
 import com.example.administrator.yymusic.ui.weather.WeatherActivity;
-import com.example.administrator.yymusic.util.LogHelper;
-import com.example.administrator.yymusic.util.YYConstant;
+import com.example.administrator.yymusic.util.LogUtil;
+import com.example.administrator.yymusic.constant.YYConstant;
 import com.example.administrator.yymusic.util.ShareUtil;
 import com.example.administrator.yymusic.widget.CircularProgressView;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
@@ -130,7 +130,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
     public void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            LogHelper.d(TAG(), "[checkPermission] 已经拥有读取权限");
+            LogUtil.d(TAG(), "[checkPermission] 已经拥有读取权限");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -155,7 +155,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (mWeatherInfo == null)
                 mLocationClient.start();
-            LogHelper.d(TAG(), "[checkPermission] 获取位置权限成功, 开始获取地理位置");
+            LogUtil.d(TAG(), "[checkPermission] 获取位置权限成功, 开始获取地理位置");
         } else
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
     }
@@ -322,7 +322,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     instance.startMusic(this, MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
                     instance.pause();
                     int musicMax = instance.getMediaPlayer().getDuration();
-                    LogHelper.i(TAG(), "[onClickMain] mProgress = " + mProgress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
+                    LogUtil.i(TAG(), "[onClickMain] mProgress = " + mProgress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
                     instance.getMediaPlayer().seekTo(musicMax * mProgress / 100);
                     instance.continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
@@ -389,14 +389,14 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 if (mLocationClient != null && mWeatherInfo == null) {
                     initSdk();
                     mLocationClient.start();
-                    LogHelper.d(TAG(), "[onClickMainDrawer] 刷新位置");
+                    LogUtil.d(TAG(), "[onClickMainDrawer] 刷新位置");
                 }
                 break;
             case R.id.main_drawer_more_btn:
                 if (mWeatherInfo == null || mWeatherInfo.getData() == null || mWeatherInfo.getData().getForecast() == null)
                     return;
 
-                LogHelper.d(TAG(), "[onClickMainDrawer] mWeatherInfo = " + mWeatherInfo);
+                LogUtil.d(TAG(), "[onClickMainDrawer] mWeatherInfo = " + mWeatherInfo);
                 startActivity(new Intent(MainActivity.this, WeatherActivity.class));
                 break;
             default:
@@ -474,7 +474,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         break;
                     case MESSAGE_FIRST_INIT:
                         activity.mInfo = ShareUtil.getInstance().getSongInfo();
-                        LogHelper.d(activity.TAG(), "[handleMessage] info = " + activity.mInfo);
+                        LogUtil.d(activity.TAG(), "[handleMessage] info = " + activity.mInfo);
                         if (activity.mInfo != null) {
                             activity.mProgress = ShareUtil.getInstance().getProgress();
                             activity.tvSongTitle.setText(activity.mInfo.getTitle());
@@ -497,18 +497,18 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                                 new WeatherTask(activity).execute(URL + c);
                             } catch (UnsupportedEncodingException e) {
                                 e.printStackTrace();
-                                LogHelper.d("MainActivity", "[handleMessage]城市文字转化异常");
+                                LogUtil.d("MainActivity", "[handleMessage]城市文字转化异常");
                             }
                         } else
                             activity.tvDrawerTitle.setText("网络异常，无法获取天气");
                         break;
 
                     case MESSAGE_NETWORK_CHANGE:
-                        LogHelper.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] ");
+                        LogUtil.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] ");
                         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             if (activity.mWeatherInfo == null) {
                                 activity.mLocationClient.start();
-                                LogHelper.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] 获取位置");
+                                LogUtil.d("MainActivity", "[handleMessage][MESSAGE_NETWORK_CHANGE] 获取位置");
                             }
                         } else
                             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
@@ -582,7 +582,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LogHelper.i(TAG(), "[onDestroy]");
+        LogUtil.i(TAG(), "[onDestroy]");
         if (!instance.isPlaying()) {
             stopService(intent);
         }
@@ -603,7 +603,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         switch (type) {
                             case YYConstant.READ_PERMISSION:
                                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
-                                LogHelper.d(TAG(), "[showAlert] 正在申请读取权限");
+                                LogUtil.d(TAG(), "[showAlert] 正在申请读取权限");
                                 break;
 
                             default:
@@ -625,11 +625,11 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        LogHelper.i(TAG(), "[onRequestPermissionsResult]  requestCode = " + requestCode + " permissions = " + permissions + "  grantResults =" + grantResults);
+        LogUtil.i(TAG(), "[onRequestPermissionsResult]  requestCode = " + requestCode + " permissions = " + permissions + "  grantResults =" + grantResults);
         switch (requestCode) {
             case REQUEST_READ:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 已经拥有读取权限");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 已经拥有读取权限");
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -644,7 +644,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         }
                     }).start();
                 } else {
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取读取权限失败");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 获取读取权限失败");
                     Toast.makeText(MainActivity.this, "获取读取权限失败，请去设置界面手动获取", Toast.LENGTH_LONG).show();
                 }
 
@@ -654,9 +654,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                         return;
                     initSdk();
                     mLocationClient.start();
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取位置权限成功，开始获取地理位置");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 获取位置权限成功，开始获取地理位置");
                 } else
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 获取位置权限失败");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 获取位置权限失败");
                 break;
 
             case REQUEST_ASK_WEATHER:
@@ -667,9 +667,9 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 开始获取天气");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 开始获取天气");
                 } else
-                    LogHelper.d(TAG(), "[onRequestPermissionsResult] 天气的网络权限获取失败");
+                    LogUtil.d(TAG(), "[onRequestPermissionsResult] 天气的网络权限获取失败");
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -687,7 +687,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             mLocationInfo.setCity(bdLocation.getCity());
             mLocationInfo.setDistrict(bdLocation.getDistrict());
             mLocationInfo.setStreet(bdLocation.getStreet());
-            LogHelper.d("MainActivity", "地理位置 = " + mLocationInfo.getCity());
+            LogUtil.d("MainActivity", "地理位置 = " + mLocationInfo.getCity());
             WeatherSys.getInstance().setLocationInfo(mLocationInfo);
             if (handler != null) {
                 Message msg = handler.obtainMessage(MESSAGE_LOCATION, mLocationInfo.getCity());
@@ -707,17 +707,17 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             }
             if (mWeatherInfo != null)
                 return;
-            LogHelper.d(TAG(), "[NetWorkStateReceiver][onReceive] action = " + intent.getAction());
-            LogHelper.d(TAG(), "[NetWorkStateReceiver][onReceive] 网络状态发生变化");
+            LogUtil.d(TAG(), "[NetWorkStateReceiver][onReceive] action = " + intent.getAction());
+            LogUtil.d(TAG(), "[NetWorkStateReceiver][onReceive] 网络状态发生变化");
             ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connMgr == null) {
-                LogHelper.d(TAG(), "[NetWorkStateReceiver][onReceive] ConnectivityManager == null");
+                LogUtil.d(TAG(), "[NetWorkStateReceiver][onReceive] ConnectivityManager == null");
                 return;
             }
             Network[] networks = connMgr.getAllNetworks();
             for (Network network : networks) {
                 Boolean isConnected = connMgr.getNetworkInfo(network).isConnected();
-                LogHelper.d(TAG(), "[NetWorkStateReceiver][onReceive] isConnected = " + isConnected);
+                LogUtil.d(TAG(), "[NetWorkStateReceiver][onReceive] isConnected = " + isConnected);
                 if (isConnected) {
                     initSdk();
                     if (mLocationClient != null) {
@@ -736,7 +736,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                             }
                         }).start();
                     }
-                    LogHelper.d(TAG(), "[NetWorkStateReceiver][onReceive] 检测到手机网络");
+                    LogUtil.d(TAG(), "[NetWorkStateReceiver][onReceive] 检测到手机网络");
                     Toast.makeText(context, "检测到手机网络", Toast.LENGTH_SHORT).show();
                     break;
                 }

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.YMBaseModel;
 import com.example.administrator.yymusic.sys.MusicPlayer;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 import com.example.administrator.yymusic.util.ShareUtil;
 
 import java.util.ArrayList;
@@ -121,7 +121,7 @@ public class FavoriteDao extends YMBaseDao {
         super.delete(db, model);
         if (model instanceof MusicInfo) {
             MusicInfo info = (MusicInfo) model;
-            LogHelper.d(TAG, "[delete] 正在删除 title = " + info.getTitle() + " url = " + info.getUrl());
+            LogUtil.d(TAG, "[delete] 正在删除 title = " + info.getTitle() + " url = " + info.getUrl());
             db.delete(TABLE_FAVORITE_MUSIC, COL_TITLE + " = ? and " + COL_URL + " = ?",
                     new String[]{info.getTitle(), info.getUrl()});
         }
@@ -172,7 +172,7 @@ public class FavoriteDao extends YMBaseDao {
                 outside = false;
                 firstInit = false;
             }
-            LogHelper.d(TAG, " [query] db info = " + i.toString());
+            LogUtil.d(TAG, " [query] db info = " + i.toString());
             infos.add(i);
         }
         cursor.close();

@@ -8,7 +8,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.example.administrator.yymusic.R;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 /**
  * Created by archermind on 17-2-14.
@@ -100,7 +100,7 @@ public class NotificationSys {
         boolean bIsLargerThanO80 = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             bIsLargerThanO80 = true;
-        LogHelper.d(LOG_TAG, "[largerThanO80] = " + bIsLargerThanO80);
+        LogUtil.d(LOG_TAG, "[largerThanO80] = " + bIsLargerThanO80);
         return bIsLargerThanO80;
     }
 

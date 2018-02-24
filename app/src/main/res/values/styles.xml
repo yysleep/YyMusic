@@ -2,7 +2,9 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppTheme.Base">
-
+        <!--Navigation bar color-->
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:colorControlNormal">@color/white</item>
     </style>
 
     <style name="SplashTheme" parent="AppTheme.Base">
@@ -47,7 +49,7 @@
         <!--模糊 -->
     </style>
 
-    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.Dark">
+    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:colorBackground">@color/white</item>
         <item name="android:textColor">@color/lotWhite</item>
         <item name="colorControlNormal">@color/white</item>

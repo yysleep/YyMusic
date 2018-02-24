@@ -32,8 +32,8 @@ import com.example.administrator.yymusic.tool.FileOperationTask;
 import com.example.administrator.yymusic.tool.MusicAdapter;
 import com.example.administrator.yymusic.ui.base.BaseFragment;
 import com.example.administrator.yymusic.ui.detail.MusicDetailActivity;
-import com.example.administrator.yymusic.util.LogHelper;
-import com.example.administrator.yymusic.util.YYConstant;
+import com.example.administrator.yymusic.util.LogUtil;
+import com.example.administrator.yymusic.constant.YYConstant;
 
 /**
  * Created by Administrator on 2016/5/25.
@@ -162,7 +162,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
             return;
         }
 
-        LogHelper.i(TAG(), "[refreshInfo]" + info.toString());
+        LogUtil.i(TAG(), "[refreshInfo]" + info.toString());
         // 判断是否有歌曲显示为播放状态
         boolean isUpdate = false;
         if (info.getUpdateFragmentNum() != 0) {
@@ -186,7 +186,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                 musicInfo.setIsPlaying(0);
             }
         }
-        LogHelper.i(TAG(), "[refreshInfo] setIsPlaying 1");
+        LogUtil.i(TAG(), "[refreshInfo] setIsPlaying 1");
         musicApapter.musicInfos.get(info.getUpdatePosition()).setIsPlaying(MusicInfo.IS_PLAYING);
         musicApapter.notifyDataSetChanged();
 
@@ -209,7 +209,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        LogHelper.d(TAG(), "[showAlert] info = " + mInfo);
+                        LogUtil.d(TAG(), "[showAlert] info = " + mInfo);
                         if (mInfo.getIsPlaying() == 1) {
                             Toast.makeText(MusicLocalFragment.this.getActivity(), "无法删除正在播放的歌曲", Toast.LENGTH_SHORT).show();
                             return;
@@ -238,7 +238,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
             musicApapter.musicInfos.remove(mInfo);
             if (MusicPlayer.getInstance().getFragmentNum() == MusicPlayer.FRAGMENT_LOCAL) {
                 MusicPlayer.getInstance().refreshList(mPosition);
-                LogHelper.d(TAG(), "[refreshDeleteFile] 当前列表为 本地列表");
+                LogUtil.d(TAG(), "[refreshDeleteFile] 当前列表为 本地列表");
             }
             musicApapter.notifyDataSetChanged();
             if (callback != null)

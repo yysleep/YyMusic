@@ -2,13 +2,15 @@ package com.example.administrator.yymusic.util;
 
 import android.util.Log;
 
+import com.example.administrator.yymusic.constant.YYConstant;
+
 /**
  * Created by archermind on 17-9-6.
  *
  * @author yysleep
  */
 
-public class LogHelper {
+public class LogUtil {
 
     private static final boolean DEBUG = true;
 

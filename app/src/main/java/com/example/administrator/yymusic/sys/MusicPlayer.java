@@ -10,7 +10,7 @@ import com.example.administrator.yymusic.dao.FavoriteDao;
 import com.example.administrator.yymusic.dao.MusicDBMgr;
 import com.example.administrator.yymusic.model.MusicInfo;
 import com.example.administrator.yymusic.model.UpdateInfo;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -129,7 +129,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public boolean removeMusicinfo(String titile) {
-        LogHelper.i(TAG, "[removeMusicinfo] fragmentNum = " + mpFragmentNum + "  mSongNum = " + mSongNum);
+        LogUtil.i(TAG, "[removeMusicinfo] fragmentNum = " + mpFragmentNum + "  mSongNum = " + mSongNum);
         if (MusicSys.getInstance().getCollectMusics() == null || MusicSys.getInstance().getCollectMusics().size() == 0)
             return false;
 
@@ -237,7 +237,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                 });
 
             } catch (Exception e) {
-                LogHelper.i(TAG, "[startMusic] 播放异常了 e = " + e.toString());
+                LogUtil.i(TAG, "[startMusic] 播放异常了 e = " + e.toString());
             }
             notifyObserver();
             return;
@@ -313,7 +313,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             });
 
         } catch (Exception e) {
-            LogHelper.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
+            LogUtil.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
         }
     }
 
@@ -325,7 +325,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         notifyObserver();
         isFocus = false;
         isPause = true;
-        LogHelper.i(TAG, "[pause]");
+        LogUtil.i(TAG, "[pause]");
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -486,7 +486,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                     sMediaPlayer.start();
                     notifyObserver();
                     isPause = false;
-                    LogHelper.i("TAG", "[onAudioFocusChange]");
+                    LogUtil.i("TAG", "[onAudioFocusChange]");
                 }
                 isFocus = true;
                 break;

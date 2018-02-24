@@ -26,8 +26,8 @@ import com.example.administrator.yymusic.sys.MusicPlayer;
 import com.example.administrator.yymusic.sys.MusicSys;
 import com.example.administrator.yymusic.tool.TapPagerAdapter;
 import com.example.administrator.yymusic.ui.base.BaseActivity;
+import com.example.administrator.yymusic.util.LogUtil;
 import com.example.administrator.yymusic.util.ShareUtil;
-import com.example.administrator.yymusic.util.LogHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -320,7 +320,7 @@ public class MusicDetailActivity extends BaseActivity {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
-        LogHelper.i(TAG(), "[refreshInfo]" + info.toString());
+        LogUtil.i(TAG(), "[refreshInfo]" + info.toString());
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null)
             mToolbar.setTitle(title);
@@ -370,11 +370,11 @@ public class MusicDetailActivity extends BaseActivity {
                         break;
 
                     case MusicConst.MUSIC_FAST:
-                        LogHelper.i(activity.TAG(), "[ProgressHandler][handleMessage] mProgress : " + activity.mProgress);
+                        LogUtil.i(activity.TAG(), "[ProgressHandler][handleMessage] mProgress : " + activity.mProgress);
                         if (activity.mProgress < 98) {
                             activity.mProgress = activity.mProgress + 3;
                         }
-                        LogHelper.i(activity.TAG(), "[ProgressHandler][handleMessage] : " + activity.mProgress);
+                        LogUtil.i(activity.TAG(), "[ProgressHandler][handleMessage] : " + activity.mProgress);
                         activity.tvProgressTime.setText(activity.getTime(max * activity.mProgress / 100));
                         activity.seekBar.setProgress(activity.mProgress);
 
@@ -415,7 +415,7 @@ public class MusicDetailActivity extends BaseActivity {
         // 得到该首歌曲最长秒数
         int musicMax = MusicPlayer.getInstance().getMediaPlayer().getDuration();
         int seekBarMax = seekBar.getMax();
-        LogHelper.i(TAG(), "[moveSeekbar] progress = " + progress + " ---  seekBarMax= " + seekBarMax + " ---  musicMax= " + musicMax);
+        LogUtil.i(TAG(), "[moveSeekbar] progress = " + progress + " ---  seekBarMax= " + seekBarMax + " ---  musicMax= " + musicMax);
         // 跳到该曲该秒
         MusicPlayer.getInstance().getMediaPlayer().seekTo(musicMax * progress / seekBarMax);
 

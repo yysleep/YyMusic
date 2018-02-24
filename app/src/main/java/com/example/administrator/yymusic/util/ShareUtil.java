@@ -59,7 +59,7 @@ public class ShareUtil {
         if (titile == null) {
             titile = "快去听歌吧";
         }
-        LogHelper.i("ShareUtil", "[saveSongInfo] title = " + titile);
+        LogUtil.i("ShareUtil", "[saveSongInfo] title = " + titile);
         int currentPosition = instance.getMediaPlayer().getCurrentPosition();
         int max = instance.getMediaPlayer().getDuration();
         int progress = (int) ((float) currentPosition * 100 / max);

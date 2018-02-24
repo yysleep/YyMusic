@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.example.administrator.yymusic.R;
 import com.example.administrator.yymusic.model.WeatherInfo;
 import com.example.administrator.yymusic.sys.WeatherSys;
-import com.example.administrator.yymusic.util.LogHelper;
+import com.example.administrator.yymusic.util.LogUtil;
 
 import java.util.List;
 
@@ -51,11 +51,11 @@ public class WeatherActivity extends AppCompatActivity {
             return;
 
         List<WeatherInfo.Data.Forecast> forecasts = info.getData().getForecast();
-        LogHelper.d(TAG, "[onStart] forecasts = " + forecasts);
+        LogUtil.d(TAG, "[onStart] forecasts = " + forecasts);
         if (forecasts == null || forecasts.isEmpty())
             return;
         mList = forecasts;
-        LogHelper.d(TAG, "[onStart] mList = " + mList + mList.get(0).getDate());
+        LogUtil.d(TAG, "[onStart] mList = " + mList + mList.get(0).getDate());
         if (mList.isEmpty())
             return;
         WeatherAdapter adapter = new WeatherAdapter();

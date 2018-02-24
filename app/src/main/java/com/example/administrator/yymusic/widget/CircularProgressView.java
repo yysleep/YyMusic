@@ -10,8 +10,6 @@ import android.view.View;
 
 
 /**
- * Created by Administrator on 2016/5/26.
- *
  * @author yysleep
  */
 public class CircularProgressView extends View {
