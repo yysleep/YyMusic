@@ -66,7 +66,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/music_detil_collect_iv"
+            android:id="@+id/music_detail_collect_iv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
@@ -75,7 +75,7 @@
             android:src="@drawable/ic_music_new_collect" />
 
         <ImageView
-            android:id="@+id/music_detil_last_tv"
+            android:id="@+id/music_detail_last_tv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
@@ -84,7 +84,7 @@
             android:src="@drawable/music_last" />
 
         <ImageView
-            android:id="@+id/music_detil_play_tv"
+            android:id="@+id/music_detail_play_tv"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="center"
@@ -92,7 +92,7 @@
             android:src="@drawable/ic_music_stop" />
 
         <ImageView
-            android:id="@+id/music_detil_next_tv"
+            android:id="@+id/music_detail_next_tv"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"

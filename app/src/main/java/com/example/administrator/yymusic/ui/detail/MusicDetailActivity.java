@@ -1,5 +1,7 @@
 package com.example.administrator.yymusic.ui.detail;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -113,7 +115,7 @@ public class MusicDetailActivity extends BaseActivity {
             }
         });
         instance = MusicPlayer.getInstance();
-        ViewPager viewPager = (ViewPager) findViewById(R.id.music_detail_vp);
+        ViewPager viewPager =  findViewById(R.id.music_detail_vp);
         if (viewPager != null) {
             viewPager.setAdapter(new TapPagerAdapter(getSupportFragmentManager(), getFragments(), false));
             viewPager.setCurrentItem(0);
@@ -145,10 +147,10 @@ public class MusicDetailActivity extends BaseActivity {
                         }
                     }
                 });
-        seekBar = (SeekBar) findViewById(R.id.music_detil_progress_sk);
-        tvMaxTime = (TextView) findViewById(R.id.music_detil_alltime_tv);
-        tvProgressTime = (TextView) findViewById(R.id.music_detil_progress_time_tv);
-        ivPlay = (ImageView) findViewById(R.id.music_detil_play_tv);
+        seekBar =  findViewById(R.id.music_detil_progress_sk);
+        tvMaxTime =  findViewById(R.id.music_detil_alltime_tv);
+        tvProgressTime =  findViewById(R.id.music_detil_progress_time_tv);
+        ivPlay =  findViewById(R.id.music_detail_play_tv);
 
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null) {
@@ -158,8 +160,8 @@ public class MusicDetailActivity extends BaseActivity {
         }
 
         handler = new ProgressHandler(MusicDetailActivity.this);
-        ivCollect = (ImageView) findViewById(R.id.music_detil_collect_iv);
-        ImageView ivNext = (ImageView) findViewById(R.id.music_detil_next_tv);
+        ivCollect =  findViewById(R.id.music_detail_collect_iv);
+        ImageView ivNext =  findViewById(R.id.music_detail_next_tv);
         ivNext.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -182,6 +184,7 @@ public class MusicDetailActivity extends BaseActivity {
                 }
                 return false;
             }
+
         });
         ivNext.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -269,7 +272,7 @@ public class MusicDetailActivity extends BaseActivity {
             return;
         }
         switch (v.getId()) {
-            case R.id.music_detil_last_tv:
+            case R.id.music_detail_last_tv:
                 if (!MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().continuePlay();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
@@ -278,7 +281,7 @@ public class MusicDetailActivity extends BaseActivity {
                 MusicPlayer.getInstance().lastMusic();
                 break;
 
-            case R.id.music_detil_play_tv:
+            case R.id.music_detail_play_tv:
                 if (MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().pause();
                     ivPlay.setImageResource(R.drawable.ic_music_play);
@@ -292,7 +295,7 @@ public class MusicDetailActivity extends BaseActivity {
 
                 break;
 
-            case R.id.music_detil_next_tv:
+            case R.id.music_detail_next_tv:
                 if (!MusicPlayer.getInstance().isPlaying()) {
                     MusicPlayer.getInstance().getMediaPlayer().start();
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
@@ -301,10 +304,11 @@ public class MusicDetailActivity extends BaseActivity {
                 MusicPlayer.getInstance().nextMusic();
                 break;
 
-            case R.id.music_detil_collect_iv:
+            case R.id.music_detail_collect_iv:
                 boolean add = MusicPlayer.getInstance().addCollectMusic();
                 if (add) {
                     ivCollect.setImageResource(R.drawable.ic_music_detilc_collected);
+                    collectAnimation(ivCollect);
                 } else {
                     if (mDialog != null)
                         mDialog.show();
@@ -450,6 +454,27 @@ public class MusicDetailActivity extends BaseActivity {
         thread = null;
         runnable = null;
         instance = null;
+    }
+
+    private void collectAnimation(View v) {
+        ObjectAnimator animatorScale0 = ObjectAnimator.ofFloat(v, "scaleX", 1, 1.5F);
+        ObjectAnimator animatorScale1 = ObjectAnimator.ofFloat(v, "scaleY", 1, 1.5F);
+
+        ObjectAnimator animatorRotation0 = ObjectAnimator.ofFloat(v, "rotation", 0, 45);
+        ObjectAnimator animatorRotation1 = ObjectAnimator.ofFloat(v, "rotation", 45, -45);
+        ObjectAnimator animatorRotation2 = ObjectAnimator.ofFloat(v, "rotation", -45, 0);
+
+        ObjectAnimator animatorScale2 = ObjectAnimator.ofFloat(v, "scaleX", 1.5F, 1);
+        ObjectAnimator animatorScale3 = ObjectAnimator.ofFloat(v, "scaleY", 1.5F, 1);
+
+        AnimatorSet set = new AnimatorSet();
+        set.play(animatorScale0).with(animatorScale1);
+        set.play(animatorRotation0).after(animatorScale1);
+        set.play(animatorRotation1).after(animatorRotation0);
+        set.play(animatorRotation2).after(animatorRotation1);
+        set.play(animatorScale2).with(animatorScale3).after(animatorRotation2);
+        set.start();
+
     }
 
 }

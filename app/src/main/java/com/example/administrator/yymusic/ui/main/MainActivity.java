@@ -1,6 +1,7 @@
 package com.example.administrator.yymusic.ui.main;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.design.widget.TabLayout;
+import android.view.animation.CycleInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,19 +65,26 @@ import java.util.List;
 
 
 public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeather {
-    private TextView tvSongTitle;
-    private CircularProgressView cpProgress;
-    private ImageView ivPlay;
+    private final static String TAG = "MainActivity";
 
+    private CircularProgressView cpProgress;
     private DrawerLayout mDrawer;
     private View mDrawerLin;
+    private Button btnMore;
+
+    private ImageView ivPlay;
+    private ImageView mIvNext;
+    private ImageView mToolIconIv;
+
+
+    private TextView tvSongTitle;
     private TextView tvLocation;
     private TextView tvDrawerTitle;
     private TextView tvWeather;
     private TextView tvTemperature;
     private TextView tvPower;
     private TextView tvDetail;
-    private Button btnMore;
+
     //    private ImageView ivPlayMode;
     public boolean isOutSide;
     Intent intent;
@@ -86,7 +96,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     ShareUtil shareUtil;
     private WeatherInfo mWeatherInfo;
     private LocationInfo mLocationInfo;
-
+    private Interpolator mInterpolator;
 
     // 百度SDK 相关信息
     private LocationClient mLocationClient;
@@ -103,6 +113,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     static final int MESSAGE_LOCATION = 1001;
     static final int MESSAGE_NETWORK_CHANGE = 1002;
     private boolean needNetWork;
+    private boolean canStartAnimation;
 
     static final String URL = "http://www.sojson.com/open/api/weather/json.shtml?city=";
 
@@ -119,8 +130,8 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         setContentView(R.layout.activity_main);
         intent = new Intent(MainActivity.this, MusicService.class);
         startService(intent);
-        initView();
         initToolBar();
+        initView();
         isOutSide = true;
         init();
         initSdk();
@@ -163,11 +174,14 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     void initToolBar() {
         Toolbar toolbar = findViewById(R.id.main_toolbar);
         // toolbar.setTitle("音乐");
-        toolbar.setNavigationIcon(R.mipmap.icons_cloud);
+        //toolbar.setNavigationIcon(R.mipmap.icons_cloud);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolIconIv = new ImageView(this);
+        mToolIconIv.setBackground(getResources().getDrawable(R.mipmap.icons_cloud));
+        toolbar.addView(mToolIconIv);
+        mToolIconIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mDrawer.openDrawer(mDrawerLin);
@@ -215,8 +229,34 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         tvSongTitle = findViewById(R.id.main_music_song_title_cv);
         cpProgress = findViewById(R.id.main_music_progress_cv);
         ivPlay = findViewById(R.id.main_play_iv);
+        mIvNext = findViewById(R.id.main_next_iv);
 
         mDrawer = findViewById(R.id.main_drawer);
+        mDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                LogUtil.d(TAG, "[initView][onDrawerSlide] slideOffset = " + slideOffset);
+                if (mToolIconIv == null) {
+                    return;
+                }
+                mToolIconIv.setRotation(slideOffset * 360);
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                LogUtil.d(TAG, "[initView][onDrawerStateChanged] newState = " + newState);
+            }
+        });
         mDrawerLin = findViewById(R.id.main_drawer_ll);
         tvLocation = findViewById(R.id.main_drawer_location_tv);
         tvDrawerTitle = findViewById(R.id.main_drawer_title_tv);
@@ -232,6 +272,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
     }
 
     private void init() {
+        canStartAnimation = true;
         mLocationInfo = new LocationInfo();
         mNetWorkReceiver = new NetWorkStateReceiver();
         registerReceiver(mNetWorkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -359,6 +400,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     MusicPlayer.sIsPauseByMyself = false;
                 }
                 instance.nextMusic();
+                nextAnimation(mIvNext);
                 break;
 
             case R.id.main_drawer_detail_tv:
@@ -742,5 +784,38 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 }
             }
         }
+    }
+
+    private void nextAnimation(View v) {
+        LogUtil.d(TAG, "[nextAnimation] canStartAnimation = " + canStartAnimation);
+        if (v == null || !canStartAnimation)
+            return;
+
+        if (mInterpolator == null) {
+            mInterpolator = new CycleInterpolator(0.5f);
+        }
+        v.animate().setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                canStartAnimation = false;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                canStartAnimation = true;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                canStartAnimation = true;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        })
+                .setInterpolator(mInterpolator)
+                .translationX(100);
     }
 }

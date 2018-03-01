@@ -87,7 +87,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="12dp"
                 android:onClick="onClickMain"
-                android:src="@drawable/music_next" />
+                android:src="@drawable/ic_music_new_next" />
 
             <com.example.administrator.yymusic.widget.CircularProgressView
                 android:id="@+id/main_music_progress_cv"
