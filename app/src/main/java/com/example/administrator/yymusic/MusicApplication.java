@@ -38,6 +38,7 @@ public class MusicApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initStorage();
+        MusicPlayer.getInstance().init(this);
         ToastUtil.init(this);
         MusicDBMgr.getInstance().init(this);
         LruCacheSys.getInstance().initContext(getApplicationContext());

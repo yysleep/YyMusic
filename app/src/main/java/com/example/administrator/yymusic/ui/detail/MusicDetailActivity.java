@@ -73,7 +73,7 @@ public class MusicDetailActivity extends BaseActivity {
         thread.start();
         if (getIntent() != null && getIntent().getIntExtra(MusicConst.MUSIC_POSITION, -3) != -3) {
             int position = getIntent().getIntExtra(MusicConst.MUSIC_POSITION, 0);
-            MusicPlayer.getInstance().startMusic(getApplicationContext(), position, 0);
+            MusicPlayer.getInstance().startMusic(position, 0);
             ivPlay.setImageResource(R.drawable.ic_music_stop);
         }
     }

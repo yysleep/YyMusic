@@ -96,7 +96,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                         return;
                     }
 
-                    MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 0);
+                    MusicPlayer.getInstance().startMusic(i, 0);
                     MusicPlayer.sIsPauseByMyself = false;
                 }
             });

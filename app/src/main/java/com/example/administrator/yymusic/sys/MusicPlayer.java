@@ -1,5 +1,6 @@
 package com.example.administrator.yymusic.sys;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -24,15 +25,15 @@ import java.util.Random;
 public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "MusicPlayer";
     public static volatile boolean sIsPauseByMyself;
-    private static List<MusicInfo> sMusicInfoList;
-    private static volatile MediaPlayer sMediaPlayer;
+    private List<MusicInfo> mMusicInfoList;
+    private MediaPlayer mMediaPlayer;
 
     private int mSongNum = -1;
     private int mpFragmentNum = -1;
     private boolean isPause;
     // 由next 和last 触发的切换歌曲
     private boolean isOurChange;
-    private Context context;
+    private Context mContext;
     private AudioManager audioManager;
     // 是否是焦点
     private boolean isFocus;
@@ -46,25 +47,31 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     public static final int FRAGMENT_DISCOVER = 2;
 
     private MusicPlayer() {
+        mMediaPlayer = new MediaPlayer();
+        hashMap = new HashMap<>();
     }
 
     private boolean isStart;
 
-    private static MusicPlayer instance;
+    @SuppressLint("StaticFieldLeak")
+    private volatile static MusicPlayer instance;
 
     public static MusicPlayer getInstance() {
         if (instance == null) {
             synchronized (MusicPlayer.class) {
                 if (instance == null) {
                     instance = new MusicPlayer();
-                    sMediaPlayer = new MediaPlayer();
                 }
             }
         }
         return instance;
     }
 
-    private HashMap<String, ITaskCallback> hashMap = new HashMap<>();
+    private HashMap<String, ITaskCallback> hashMap;
+
+    public void init(Context context){
+        mContext = context.getApplicationContext();
+    }
 
     public void registMusicObserver(String name, ITaskCallback iTaskCallback) {
         if (name == null)
@@ -146,7 +153,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
 
     // 改变当前所属于的list
     public void changeList(List<MusicInfo> lists) {
-        sMusicInfoList = lists;
+        mMusicInfoList = lists;
     }
 
     // 改变当前播放歌曲的position
@@ -162,62 +169,65 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
 
     public void update() {
         String path = null;
-        if (isPlaying() && sMusicInfoList != null && sMusicInfoList.size() > mSongNum) {
-            path = sMusicInfoList.get(mSongNum).getUrl();
+        if (isPlaying() && mMusicInfoList != null && mMusicInfoList.size() > mSongNum) {
+            path = mMusicInfoList.get(mSongNum).getUrl();
         }
-        sMusicInfoList = null;
+        mMusicInfoList = null;
         switch (mpFragmentNum) {
             case FRAGMENT_LOCAL:
-                sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                 break;
             case FRAGMENT_COLLECT:
-                sMusicInfoList = MusicSys.getInstance().getCollectMusics();
+                mMusicInfoList = MusicSys.getInstance().getCollectMusics();
                 break;
             case FRAGMENT_DISCOVER:
-                sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                 break;
             default:
-                sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                 break;
         }
         if (path == null)
             return;
 
-        for (int i = 0; i < sMusicInfoList.size(); i++) {
-            if (sMusicInfoList.get(i).getUrl().equals(path)) {
+        for (int i = 0; i < mMusicInfoList.size(); i++) {
+            if (mMusicInfoList.get(i).getUrl().equals(path)) {
                 mSongNum = i;
                 return;
             }
         }
     }
 
-    public void requestAudioFocus() {
+    private void requestAudioFocus() {
         if (audioManager != null && !isFocus) {
             audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             isFocus = true;
         }
     }
 
-    public void startMusic(final Context context, int position, int fragmentNum) {
-        this.context = context;
+    public void startMusic(int position, int fragmentNum) {
+        if (mContext == null){
+            LogUtil.e(TAG, "[startMusic] mContext = null");
+            return;
+        }
         if (updateInfo == null) {
             updateInfo = new UpdateInfo();
         }
         if (audioManager == null) {
-            audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         }
         requestAudioFocus();
         if (position == MusicConst.START_DEFAULT_POSITION && fragmentNum == MusicConst.START_DEFAULT_FRAGMENT) {
             // 这是由播放按键所触发的播放 并不是选取其中某个item
             try {
-                sMediaPlayer.start();
+                mMediaPlayer.start();
                 isPause = false;
                 isOurChange = false;
                 if (!isStart) {
                     isStart = true;
                 }
                 // 播放完成后的监听
-                sMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
                         switch (playMode) {
@@ -244,30 +254,30 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         }
         String lastName = null;
         if (isStart && !isOurChange) {
-            lastName = sMusicInfoList.get(mSongNum).getDis_name();
+            lastName = mMusicInfoList.get(mSongNum).getDis_name();
         }
         if (mpFragmentNum != fragmentNum) {
             mpFragmentNum = fragmentNum;
             switch (fragmentNum) {
                 case FRAGMENT_LOCAL:
-                    sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                    mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                     break;
                 case FRAGMENT_COLLECT:
-                    sMusicInfoList = MusicSys.getInstance().getCollectMusics();
+                    mMusicInfoList = MusicSys.getInstance().getCollectMusics();
                     break;
                 case FRAGMENT_DISCOVER:
-                    sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                    mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                     break;
                 default:
-                    sMusicInfoList = MusicSys.getInstance().getLocalMusics();
+                    mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                     break;
             }
         }
 
         mSongNum = position;
-        if ((sMediaPlayer.isPlaying() || isPauseing()) && lastName != null && lastName.equals(sMusicInfoList.get(position).getDis_name())) {
+        if ((mMediaPlayer.isPlaying() || isPauseing()) && lastName != null && lastName.equals(mMusicInfoList.get(position).getDis_name())) {
             if (isPauseing()) {
-                sMediaPlayer.start();
+                mMediaPlayer.start();
                 isPause = false;
                 isOurChange = false;
                 if (!isStart) {
@@ -279,10 +289,10 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         }
 
         try {
-            sMediaPlayer.reset();
-            sMediaPlayer.setDataSource(sMusicInfoList.get(mSongNum).getUrl());
-            sMediaPlayer.prepare();
-            sMediaPlayer.start();
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(mMusicInfoList.get(mSongNum).getUrl());
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
             isPause = false;
             isOurChange = false;
 
@@ -292,7 +302,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             notifyObserver();
 
             // 播放完成后的监听
-            sMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     switch (playMode) {
@@ -321,7 +331,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         if (isPause)
             return;
 
-        sMediaPlayer.pause();
+        mMediaPlayer.pause();
         notifyObserver();
         isFocus = false;
         isPause = true;
@@ -329,17 +339,17 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public MediaPlayer getMediaPlayer() {
-        return sMediaPlayer;
+        return mMediaPlayer;
     }
 
     // 播放下一首
     public void nextMusic() {
-        if (mpFragmentNum < 0 || sMusicInfoList == null) {
+        if (mpFragmentNum < 0 || mMusicInfoList == null) {
             return;
         }
         isOurChange = true;
-        mSongNum = mSongNum == sMusicInfoList.size() - 1 ? 0 : mSongNum + 1;
-        startMusic(context, mSongNum, mpFragmentNum);
+        mSongNum = mSongNum == mMusicInfoList.size() - 1 ? 0 : mSongNum + 1;
+        startMusic(mSongNum, mpFragmentNum);
 //        MainSys.getInstance().useCallback(MusicDetailActivity.class.getName(), 1);
     }
 
@@ -349,49 +359,48 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             return;
         }
         isOurChange = true;
-        mSongNum = mSongNum == 0 ? sMusicInfoList.size() - 1 : mSongNum - 1;
-        startMusic(context, mSongNum, mpFragmentNum);
+        mSongNum = mSongNum == 0 ? mMusicInfoList.size() - 1 : mSongNum - 1;
+        startMusic(mSongNum, mpFragmentNum);
 //        MainSys.getInstance().useCallback(MusicDetailActivity.class.getName(), 1);
     }
 
-    public void randomMusic() {
+    private void randomMusic() {
         if (mpFragmentNum < 0) {
             return;
         }
         isOurChange = true;
         int num = mSongNum;
-        while (num == mSongNum && sMusicInfoList.size() > 1) {
-            mSongNum = new Random().nextInt(sMusicInfoList.size());
+        while (num == mSongNum && mMusicInfoList.size() > 1) {
+            mSongNum = new Random().nextInt(mMusicInfoList.size());
         }
-        startMusic(context, mSongNum, mpFragmentNum);
+        startMusic(mSongNum, mpFragmentNum);
     }
 
-    public void singleMusic() {
+    private void singleMusic() {
         if (mpFragmentNum < 0) {
             return;
         }
         isOurChange = true;
-        startMusic(context, mSongNum, mpFragmentNum);
+        startMusic(mSongNum, mpFragmentNum);
     }
 
     public MusicInfo getSongInfo() {
-        if (mSongNum >= 0 && sMusicInfoList != null && sMusicInfoList.size() > mSongNum) {
-            MusicInfo info = sMusicInfoList.get(mSongNum);
-            return info == null ? null : info;
+        if (mSongNum >= 0 && mMusicInfoList != null && mMusicInfoList.size() > mSongNum) {
+            return mMusicInfoList.get(mSongNum);
         }
         return null;
     }
 
     public String getSongTitle() {
-        if (mSongNum >= 0 && sMusicInfoList != null && sMusicInfoList.size() > mSongNum && sMusicInfoList.get(mSongNum) != null) {
-            return sMusicInfoList.get(mSongNum).getTitle();
+        if (mSongNum >= 0 && mMusicInfoList != null && mMusicInfoList.size() > mSongNum && mMusicInfoList.get(mSongNum) != null) {
+            return mMusicInfoList.get(mSongNum).getTitle();
         }
         return null;
     }
 
     public String getUrl() {
-        if (mSongNum >= 0 && sMusicInfoList != null && sMusicInfoList.size() > mSongNum && sMusicInfoList.get(mSongNum) != null) {
-            return sMusicInfoList.get(mSongNum).getUrl();
+        if (mSongNum >= 0 && mMusicInfoList != null && mMusicInfoList.size() > mSongNum && mMusicInfoList.get(mSongNum) != null) {
+            return mMusicInfoList.get(mSongNum).getUrl();
         }
         return null;
     }
@@ -404,28 +413,20 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public long getSongId() {
-        if (sMusicInfoList != null && sMusicInfoList.size() > 0) {
-            return sMusicInfoList.get(mSongNum).getMusicId();
+        if (mMusicInfoList != null && mMusicInfoList.size() > 0) {
+            return mMusicInfoList.get(mSongNum).getMusicId();
         }
         return 0;
     }
 
     public boolean isPlaying() {
-        if (sMediaPlayer == null) {
-            return false;
-        }
-        return sMediaPlayer.isPlaying();
+        return mMediaPlayer != null && mMediaPlayer.isPlaying();
     }
 
     public void continuePlay() {
-        sMediaPlayer.start();
+        mMediaPlayer.start();
         requestAudioFocus();
         isPause = false;
-    }
-
-    // 获取第几首
-    public int getmSongNum() {
-        return mSongNum;
     }
 
     // 是否未曾播放过
@@ -433,8 +434,8 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         return isStart;
     }
 
-    public MusicInfo getMusicInfoNow() {
-        return sMusicInfoList.get(mSongNum);
+    private MusicInfo getMusicInfoNow() {
+        return mMusicInfoList.get(mSongNum);
     }
 
     public boolean isPauseing() {
@@ -483,7 +484,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                 if (isPause) {
                     if (!isFocus)
                         requestAudioFocus();
-                    sMediaPlayer.start();
+                    mMediaPlayer.start();
                     notifyObserver();
                     isPause = false;
                     LogUtil.i("TAG", "[onAudioFocusChange]");
@@ -525,9 +526,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
 
     public void onDestroy() {
         if (isStart) {
-            sMusicInfoList.get(mSongNum).setIsPlaying(0);
+            mMusicInfoList.get(mSongNum).setIsPlaying(0);
             isStart = false;
-            sMusicInfoList = null;
+            mMusicInfoList = null;
         }
         mSongNum = -1;
         instance = null;

@@ -360,7 +360,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
         switch (v.getId()) {
             case R.id.main_play_iv:
                 if (isContinue && mInfo != null) {
-                    instance.startMusic(this, MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
+                    instance.startMusic(MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
                     instance.pause();
                     int musicMax = instance.getMediaPlayer().getDuration();
                     LogUtil.i(TAG(), "[onClickMain] mProgress = " + mProgress + " ---  seekBarMax = " + 100 + " ---  musicMax= " + musicMax);
@@ -385,7 +385,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 break;
             case R.id.main_next_iv:
                 if (isContinue && mInfo != null) {
-                    instance.startMusic(this, MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
+                    instance.startMusic(MusicSys.getInstance().getPosition(mInfo.getFragmentNum(), mInfo), mInfo.getFragmentNum());
                     instance.nextMusic();
                     isContinue = false;
                     break;
@@ -395,12 +395,12 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     break;
                 }
 
+                nextAnimation(mIvNext);
                 if (instance.isPlaying()) {
                     ivPlay.setImageResource(R.drawable.ic_music_stop);
                     MusicPlayer.sIsPauseByMyself = false;
                 }
                 instance.nextMusic();
-                nextAnimation(mIvNext);
                 break;
 
             case R.id.main_drawer_detail_tv:

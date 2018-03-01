@@ -71,7 +71,7 @@ public class MusicDiscoverFragment extends BaseFragment implements ITaskInterfac
             lvMusic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    MusicPlayer.getInstance().startMusic(getActivity().getApplicationContext(), i, 2);
+                    MusicPlayer.getInstance().startMusic(i, 2);
                 }
             });
         }
