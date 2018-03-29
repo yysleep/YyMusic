@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Looper;
+import android.support.annotation.UiThread;
 
+import com.example.administrator.yymusic.MusicApplication;
 import com.example.administrator.yymusic.api.ITaskCallback;
 import com.example.administrator.yymusic.common.MusicConst;
 import com.example.administrator.yymusic.dao.FavoriteDao;
@@ -16,6 +19,8 @@ import com.example.administrator.yymusic.util.LogUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Administrator on 2016/5/22.
@@ -38,6 +43,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     // 是否是焦点
     private boolean isFocus;
     private UpdateInfo updateInfo;
+    private ExecutorService mSingleExecutor;
 
     // 播放模式
     private int playMode = MusicConst.SEQUENTIAL_PLAY;
@@ -49,6 +55,8 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     private MusicPlayer() {
         mMediaPlayer = new MediaPlayer();
         hashMap = new HashMap<>();
+        mSingleExecutor = Executors.newSingleThreadExecutor();
+        updateInfo = new UpdateInfo();
     }
 
     private boolean isStart;
@@ -69,8 +77,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
 
     private HashMap<String, ITaskCallback> hashMap;
 
-    public void init(Context context){
+    public void init(Context context) {
         mContext = context.getApplicationContext();
+        audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public void registMusicObserver(String name, ITaskCallback iTaskCallback) {
@@ -205,17 +214,12 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         }
     }
 
-    public void startMusic(int position, int fragmentNum) {
-        if (mContext == null){
+    public void startMusic(final int position, final int fragmentNum) {
+        if (mContext == null) {
             LogUtil.e(TAG, "[startMusic] mContext = null");
             return;
         }
-        if (updateInfo == null) {
-            updateInfo = new UpdateInfo();
-        }
-        if (audioManager == null) {
-            audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        }
+
         requestAudioFocus();
         if (position == MusicConst.START_DEFAULT_POSITION && fragmentNum == MusicConst.START_DEFAULT_FRAGMENT) {
             // 这是由播放按键所触发的播放 并不是选取其中某个item
@@ -288,43 +292,52 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             return;
         }
 
-        try {
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(mMusicInfoList.get(mSongNum).getUrl());
-            mMediaPlayer.prepare();
-            mMediaPlayer.start();
-            isPause = false;
-            isOurChange = false;
 
-            if (!isStart) {
-                isStart = true;
-            }
-            notifyObserver();
+        mSingleExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mMediaPlayer.reset();
+                    mMediaPlayer.setDataSource(mMusicInfoList.get(mSongNum).getUrl());
+                    mMediaPlayer.prepare();
+                    mMediaPlayer.start();
 
-            // 播放完成后的监听
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    switch (playMode) {
-                        case MusicConst.SINGLE_PLAY:
-                            singleMusic();
-                            break;
-
-                        case MusicConst.RANDOM_PLAY:
-                            randomMusic();
-                            break;
-
-                        default:
-                            nextMusic();
-                            break;
-                    }
-
+                } catch (Exception e) {
+                    LogUtil.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
                 }
-            });
+            }
+        });
 
-        } catch (Exception e) {
-            LogUtil.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
+        isPause = false;
+        isOurChange = false;
+
+        if (!isStart) {
+            isStart = true;
         }
+        notifyObserver();
+
+        // 播放完成后的监听
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                switch (playMode) {
+                    case MusicConst.SINGLE_PLAY:
+                        singleMusic();
+                        break;
+
+                    case MusicConst.RANDOM_PLAY:
+                        randomMusic();
+                        break;
+
+                    default:
+                        nextMusic();
+                        break;
+                }
+
+            }
+        });
+
+
     }
 
     public void pause() {
@@ -517,10 +530,23 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             Map.Entry<String, ITaskCallback> entry = (Map.Entry) iter.next();
             entry.getValue().getBmpSuccess(info);
         }*/
-
-        for (ITaskCallback i : hashMap.values()) {
-            i.refreshInfo(updateInfo);
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            LogUtil.d(TAG, "[notifyObserver]" + Thread.currentThread().getName());
+            for (ITaskCallback i : hashMap.values()) {
+                i.refreshInfo(updateInfo);
+            }
+        } else {
+            MusicApplication.getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    LogUtil.d(TAG, "[notifyObserver]" + Thread.currentThread().getName());
+                    for (ITaskCallback i : hashMap.values()) {
+                        i.refreshInfo(updateInfo);
+                    }
+                }
+            });
         }
+
 
     }
 

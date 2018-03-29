@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class MusicApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        sHandler = new Handler(Looper.getMainLooper());
         initStorage();
         MusicPlayer.getInstance().init(this);
         ToastUtil.init(this);
@@ -99,9 +101,6 @@ public class MusicApplication extends Application {
     }
 
     public static Handler getHandler() {
-        if (sHandler == null) {
-            sHandler = new Handler();
-        }
         return sHandler;
     }
 

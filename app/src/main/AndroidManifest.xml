@@ -48,6 +48,7 @@
 
         <activity
             android:name=".ui.detail.MusicDetailActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Base">
             <intent-filter>
