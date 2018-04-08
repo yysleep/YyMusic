@@ -5,7 +5,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Looper;
-import android.support.annotation.UiThread;
 
 import com.example.administrator.yymusic.MusicApplication;
 import com.example.administrator.yymusic.api.ITaskCallback;
@@ -19,15 +18,15 @@ import com.example.administrator.yymusic.util.LogUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Administrator on 2016/5/22.
  *
  * @author yysleep
  */
-public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
+public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
     private static final String TAG = "MusicPlayer";
     public static volatile boolean sIsPauseByMyself;
     private List<MusicInfo> mMusicInfoList;
@@ -43,7 +42,8 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     // 是否是焦点
     private boolean isFocus;
     private UpdateInfo updateInfo;
-    private ExecutorService mSingleExecutor;
+    private boolean isStart;
+    private Timer mTimer;
 
     // 播放模式
     private int playMode = MusicConst.SEQUENTIAL_PLAY;
@@ -53,13 +53,15 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
     public static final int FRAGMENT_DISCOVER = 2;
 
     private MusicPlayer() {
-        mMediaPlayer = new MediaPlayer();
-        hashMap = new HashMap<>();
-        mSingleExecutor = Executors.newSingleThreadExecutor();
-        updateInfo = new UpdateInfo();
+        init();
     }
 
-    private boolean isStart;
+    private void init() {
+        mMediaPlayer = new MediaPlayer();
+        hashMap = new HashMap<>();
+        updateInfo = new UpdateInfo();
+        mTimer = new Timer();
+    }
 
     @SuppressLint("StaticFieldLeak")
     private volatile static MusicPlayer instance;
@@ -107,8 +109,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         if (musicInfo == null) {
             return false;
         }
+        LogUtil.d(TAG,"[addCollectMusic] musicInfo = " + musicInfo);
         for (MusicInfo info : MusicSys.getInstance().getCollectMusics()) {
-            if (info.getDis_name().equals(musicInfo.getDis_name())) {
+            if (info.getUrl().equals(musicInfo.getUrl())) {
                 return false;
             }
         }
@@ -230,28 +233,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                 if (!isStart) {
                     isStart = true;
                 }
-                // 播放完成后的监听
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        switch (playMode) {
-                            case MusicConst.SINGLE_PLAY:
-                                singleMusic();
-                                break;
-
-                            case MusicConst.RANDOM_PLAY:
-                                randomMusic();
-                                break;
-
-                            default:
-                                nextMusic();
-                                break;
-                        }
-                    }
-                });
-
             } catch (Exception e) {
-                LogUtil.i(TAG, "[startMusic] 播放异常了 e = " + e.toString());
+                LogUtil.e(TAG, "[startMusic] 播放异常0");
+                e.printStackTrace();
             }
             notifyObserver();
             return;
@@ -292,21 +276,15 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             }
         }
 
-
-        mSingleExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mMediaPlayer.reset();
-                    mMediaPlayer.setDataSource(mMusicInfoList.get(mSongNum).getUrl());
-                    mMediaPlayer.prepare();
-                    mMediaPlayer.start();
-
-                } catch (Exception e) {
-                    LogUtil.e(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
-                }
-            }
-        });
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+        mTimer = new Timer();
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.stop();
+            mMediaPlayer.setOnCompletionListener(null);
+        }
+        mTimer.schedule(new Task(), 300);
 
         isPause = false;
         isOurChange = false;
@@ -315,29 +293,6 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             isStart = true;
         }
         notifyObserver();
-
-        // 播放完成后的监听
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                switch (playMode) {
-                    case MusicConst.SINGLE_PLAY:
-                        singleMusic();
-                        break;
-
-                    case MusicConst.RANDOM_PLAY:
-                        randomMusic();
-                        break;
-
-                    default:
-                        nextMusic();
-                        break;
-                }
-
-            }
-        });
-
-
     }
 
     public void pause() {
@@ -363,7 +318,6 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
         isOurChange = true;
         mSongNum = mSongNum == mMusicInfoList.size() - 1 ? 0 : mSongNum + 1;
         startMusic(mSongNum, mpFragmentNum);
-//        MainSys.getInstance().useCallback(MusicDetailActivity.class.getName(), 1);
     }
 
     // 播放上一首
@@ -568,4 +522,44 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
             mSongNum--;
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        LogUtil.d(TAG, "[onCompletion]");
+        switch (playMode) {
+            case MusicConst.SINGLE_PLAY:
+                singleMusic();
+                break;
+
+            case MusicConst.RANDOM_PLAY:
+                randomMusic();
+                break;
+
+            default:
+                nextMusic();
+                break;
+        }
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
+    }
+
+    private class Task extends TimerTask {
+
+        @Override
+        public void run() {
+            LogUtil.d(TAG, "[Task][run]" + Thread.currentThread().getName());
+            try {
+                mMediaPlayer.reset();
+                mMediaPlayer.setDataSource(mMusicInfoList.get(mSongNum).getUrl());
+                mMediaPlayer.setOnPreparedListener(MusicPlayer.this);
+                mMediaPlayer.setOnCompletionListener(MusicPlayer.this);
+                mMediaPlayer.prepare();
+            } catch (Exception e) {
+                LogUtil.e(TAG, "[startMusic] 播放异常1");
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -297,8 +297,7 @@ public class MusicDetailActivity extends BaseActivity {
 
             case R.id.music_detail_next_tv:
                 if (!MusicPlayer.getInstance().isPlaying()) {
-                    MusicPlayer.getInstance().getMediaPlayer().start();
-                    ivPlay.setImageResource(R.drawable.ic_music_stop);
+                    //MusicPlayer.getInstance().getMediaPlayer().start();
                     MusicPlayer.sIsPauseByMyself = false;
                 }
                 MusicPlayer.getInstance().nextMusic();
@@ -324,6 +323,7 @@ public class MusicDetailActivity extends BaseActivity {
     public void refreshInfo(UpdateInfo info) {
         if (info == null || info.getUpdateTitle() == null)
             return;
+        ivPlay.setImageResource(R.drawable.ic_music_stop);
         LogUtil.i(TAG(), "[refreshInfo]" + info.toString());
         String title = MusicPlayer.getInstance().getSongTitle();
         if (title != null)
