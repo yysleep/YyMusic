@@ -287,9 +287,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                 if (!isStart) {
                     isStart = true;
                 }
+                notifyObserver();
+                return;
             }
-            notifyObserver();
-            return;
         }
 
 
@@ -303,7 +303,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener {
                     mMediaPlayer.start();
 
                 } catch (Exception e) {
-                    LogUtil.i(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
+                    LogUtil.e(TAG, "[startMusic] 播放异常 e1 = " + e.toString());
                 }
             }
         });

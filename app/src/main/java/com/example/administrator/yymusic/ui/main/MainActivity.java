@@ -455,9 +455,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
             return;
 
         tvSongTitle.setText(info.getUpdateTitle());
-        if (instance.isPlaying()) {
-            ivPlay.setImageResource(R.drawable.ic_music_stop);
-        }
+        ivPlay.setImageResource(R.drawable.ic_music_stop);
     }
 
     @Override
