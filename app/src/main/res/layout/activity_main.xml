@@ -89,7 +89,7 @@
                 android:onClick="onClickMain"
                 android:src="@drawable/ic_music_new_next" />
 
-            <com.example.administrator.yymusic.widget.CircularProgressView
+            <com.yy.sleep.music.widget.CircularProgressView
                 android:id="@+id/main_music_progress_cv"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
