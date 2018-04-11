@@ -109,7 +109,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
         if (musicInfo == null) {
             return false;
         }
-        LogUtil.d(TAG,"[addCollectMusic] musicInfo = " + musicInfo);
+        LogUtil.d(TAG, "[addCollectMusic] musicInfo = " + musicInfo);
         for (MusicInfo info : MusicSys.getInstance().getCollectMusics()) {
             if (info.getUrl().equals(musicInfo.getUrl())) {
                 return false;
@@ -222,7 +222,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
             LogUtil.e(TAG, "[startMusic] mContext = null");
             return;
         }
-
+        boolean sameMusic = false;
         requestAudioFocus();
         if (position == MusicConst.START_DEFAULT_POSITION && fragmentNum == MusicConst.START_DEFAULT_FRAGMENT) {
             // 这是由播放按键所触发的播放 并不是选取其中某个item
@@ -245,7 +245,9 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
             lastName = mMusicInfoList.get(mSongNum).getDis_name();
         }
         if (mpFragmentNum != fragmentNum) {
-            mpFragmentNum = fragmentNum;
+            String url = null;
+            MusicInfo info = mSongNum < 0 ? null : mMusicInfoList.get(mSongNum);
+            url = info != null ? info.getUrl() : null;
             switch (fragmentNum) {
                 case FRAGMENT_LOCAL:
                     mMusicInfoList = MusicSys.getInstance().getLocalMusics();
@@ -260,6 +262,12 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
                     mMusicInfoList = MusicSys.getInstance().getLocalMusics();
                     break;
             }
+
+            info = position < 0 ? null : mMusicInfoList.get(position);
+            if (url != null && info != null) {
+                sameMusic = url.equals(info.getUrl());
+            }
+            mpFragmentNum = fragmentNum;
         }
 
         mSongNum = position;
@@ -276,6 +284,17 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
             }
         }
 
+        isPause = false;
+        isOurChange = false;
+
+        if (!isStart) {
+            isStart = true;
+        }
+        notifyObserver();
+        // 同一首歌在不同列表中切换时，不会重头播放
+        if (sameMusic) {
+            return;
+        }
         if (mTimer != null) {
             mTimer.cancel();
         }
@@ -285,14 +304,6 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
             mMediaPlayer.setOnCompletionListener(null);
         }
         mTimer.schedule(new Task(), 300);
-
-        isPause = false;
-        isOurChange = false;
-
-        if (!isStart) {
-            isStart = true;
-        }
-        notifyObserver();
     }
 
     public void pause() {
