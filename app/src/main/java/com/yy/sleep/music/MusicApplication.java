@@ -1,16 +1,18 @@
 package com.yy.sleep.music;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import com.yy.sleep.music.common.MusicConst;
 import com.yy.sleep.music.dao.MusicDBMgr;
@@ -23,6 +25,7 @@ import com.yy.sleep.music.util.ShareUtil;
 import com.yy.sleep.music.util.ToastUtil;
 
 import java.io.File;
+import java.util.LinkedList;
 
 
 /**
@@ -33,33 +36,84 @@ import java.io.File;
 public class MusicApplication extends Application {
 
     private static final String TAG = "MusicApplication";
-    private static Handler sHandler;
+    private Handler mHandler;
+    private LinkedList<Activity> mActivityList;
+    private static MusicApplication sApplication;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        sHandler = new Handler(Looper.getMainLooper());
-        initStorage();
+
+        sApplication = this;
+        mHandler = new Handler(Looper.getMainLooper());
+        mActivityList = new LinkedList<>();
+
         MusicPlayer.getInstance().init(this);
         ToastUtil.init(this);
         MusicDBMgr.getInstance().init(this);
         LruCacheSys.getInstance().initContext(getApplicationContext());
-
-        getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, new MusicObserver(null));
         ShareUtil.getInstance().init(getApplicationContext());
+        CrashHandler.init();
+
+        getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mObserver);
+        registerActivityLifecycleCallbacks(mCallbacks);
     }
 
+    public static MusicApplication getApplication() {
+        return sApplication;
+    }
 
-    private class MusicObserver extends ContentObserver {
+    public Handler getHandler() {
+        return mHandler;
+    }
 
-        /**
-         * Creates a content observer.
-         *
-         * @param handler The handler to run {@link #onChange} on, or null if none.
-         */
-        MusicObserver(Handler handler) {
-            super(handler);
+    public void killProcess() {
+        LogUtil.d(TAG, "[killProcess]" + mActivityList.size());
+        while (!mActivityList.isEmpty()) {
+            mActivityList.pollLast().finish();
         }
+        Process.killProcess(Process.myPid());
+    }
+
+    private ActivityLifecycleCallbacks mCallbacks = new ActivityLifecycleCallbacks() {
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            mActivityList.add(activity);
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+            mActivityList.remove(activity);
+        }
+    };
+
+    private ContentObserver mObserver =  new ContentObserver(null) {
+
 
         @Override
         public void onChange(boolean selfChange) {
@@ -86,22 +140,5 @@ public class MusicApplication extends Application {
             intent.putExtra(MusicConst.CHANGE_FROM_OUTSIDE, true);
             getApplicationContext().sendBroadcast(intent);
         }
-    }
-
-    private boolean initStorage() {
-        // 图片存储路径
-        String imagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/yymusic/album/";
-        File fileImage = new File(imagePath);
-        if (!fileImage.exists()) {
-            if (!fileImage.mkdirs()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static Handler getHandler() {
-        return sHandler;
-    }
-
+    };
 }

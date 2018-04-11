@@ -23,7 +23,7 @@ public class ToastUtil {
             sToast.setText(content);
             sToast.show();
         } else {
-            MusicApplication.getHandler().post(new Runnable() {
+            MusicApplication.getApplication().getHandler().post(new Runnable() {
                 @Override
                 public void run() {
                     sToast.setText(content);

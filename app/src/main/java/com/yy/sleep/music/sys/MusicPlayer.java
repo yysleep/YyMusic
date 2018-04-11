@@ -501,7 +501,7 @@ public class MusicPlayer implements AudioManager.OnAudioFocusChangeListener, Med
                 i.refreshInfo(updateInfo);
             }
         } else {
-            MusicApplication.getHandler().post(new Runnable() {
+            MusicApplication.getApplication().getHandler().post(new Runnable() {
                 @Override
                 public void run() {
                     LogUtil.d(TAG, "[notifyObserver]" + Thread.currentThread().getName());

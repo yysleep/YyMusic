@@ -1,17 +1,14 @@
 package com.yy.sleep.music.ui.main;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +30,6 @@ import com.yy.sleep.music.tool.MusicAdapter;
 import com.yy.sleep.music.ui.base.BaseFragment;
 import com.yy.sleep.music.ui.detail.MusicDetailActivity;
 import com.yy.sleep.music.util.LogUtil;
-import com.yy.sleep.music.constant.YYConstant;
 
 /**
  * Created by Administrator on 2016/5/25.
@@ -108,7 +104,7 @@ public class MusicLocalFragment extends BaseFragment implements ITaskInterface {
                     if (mInfo != null && position >= 0) {
                         showAlert(position);
                         /*if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            ((MainActivity) getActivity()).showAlert(YYConstant.READ_PERMISSION);
+                            ((MainActivity) getActivity()).showAlert(Constant.READ_PERMISSION);
                         } else {
                             showAlert(position);
                         }*/

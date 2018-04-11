@@ -36,6 +36,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.yy.sleep.music.Constant;
 import com.yy.sleep.music.R;
 import com.yy.sleep.music.common.MusicConst;
 import com.yy.sleep.music.model.LocationInfo;
@@ -51,7 +52,6 @@ import com.yy.sleep.music.tool.WeatherTask;
 import com.yy.sleep.music.ui.base.BaseActivity;
 import com.yy.sleep.music.ui.weather.WeatherActivity;
 import com.yy.sleep.music.util.LogUtil;
-import com.yy.sleep.music.constant.YYConstant;
 import com.yy.sleep.music.util.ShareUtil;
 import com.yy.sleep.music.widget.CircularProgressView;
 import com.yy.sleep.music.ui.detail.MusicDetailActivity;
@@ -156,7 +156,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                 }
             }).start();
         } else {
-            // showAlert(YYConstant.READ_PERMISSION);
+            // showAlert(Constant.READ_PERMISSION);
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
             LogUtil.d(TAG(), "[showAlert] 正在申请读取权限");
         }
@@ -643,7 +643,7 @@ public class MainActivity extends BaseActivity implements WeatherTask.ITaskWeath
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (type) {
-                            case YYConstant.READ_PERMISSION:
+                            case Constant.READ_PERMISSION:
                                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ);
                                 LogUtil.d(TAG(), "[showAlert] 正在申请读取权限");
                                 break;
