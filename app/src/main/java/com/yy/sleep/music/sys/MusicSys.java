@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -104,9 +102,7 @@ public class MusicSys {
                 MusicInfo i = MusicPlayer.getInstance().getSongInfo();
                 if (i != null)
                     url = i.getUrl();
-                i = null;
             }
-
             localMusics = null;
         }
         localMusics = new ArrayList<>();
@@ -194,9 +190,12 @@ public class MusicSys {
     // 从外界直接点击音乐文件开始播放
     public int getFileMusicPosition(Activity activity) {
         Uri uri = activity.getIntent().getData();
-        String scheme = uri.getScheme();
+        String scheme = null;
+        if (uri != null) {
+            scheme = uri.getScheme();
+        }
         String data = null;
-        if (scheme == null)
+        if (uri != null && scheme == null)
             data = uri.getPath();
         else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             data = uri.getPath();
@@ -232,27 +231,6 @@ public class MusicSys {
         }
 
         return -3;
-    }
-
-
-    /**
-     * 获得指定大小的bitmap
-     */
-    private Bitmap loadBitmap(String uri, int length) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        // 仅获取大小
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(uri, options);
-        int maxLength = options.outWidth > options.outHeight ? options.outWidth : options.outHeight;
-        // 压缩尺寸，避免卡顿
-        int inSampleSize = maxLength / length;
-        if (inSampleSize < 1) {
-            inSampleSize = 1;
-        }
-        options.inSampleSize = inSampleSize;
-        // 获取bitmap
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(uri, options);
     }
 
     public boolean checkIsPalying(String path) {

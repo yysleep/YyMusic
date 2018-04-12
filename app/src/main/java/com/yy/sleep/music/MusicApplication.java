@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
@@ -24,7 +23,6 @@ import com.yy.sleep.music.util.LogUtil;
 import com.yy.sleep.music.util.ShareUtil;
 import com.yy.sleep.music.util.ToastUtil;
 
-import java.io.File;
 import java.util.LinkedList;
 
 

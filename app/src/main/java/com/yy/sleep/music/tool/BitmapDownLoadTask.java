@@ -147,4 +147,24 @@ public class BitmapDownLoadTask extends AsyncTask<String, Void, String[]> {
         return roundedSize;
     }
 
+    /**
+     * 获得指定大小的bitmap
+     */
+    private Bitmap loadBitmap(String uri, int length) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        // 仅获取大小
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(uri, options);
+        int maxLength = options.outWidth > options.outHeight ? options.outWidth : options.outHeight;
+        // 压缩尺寸，避免卡顿
+        int inSampleSize = maxLength / length;
+        if (inSampleSize < 1) {
+            inSampleSize = 1;
+        }
+        options.inSampleSize = inSampleSize;
+        // 获取bitmap
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(uri, options);
+    }
+
 }

@@ -17,4 +17,6 @@ public class Constant {
     public static final String DIR_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/YyMusic";
 
     public static final String CRASH_PATH = DIR_PATH  + "/CrashLog.txt";
+
+    public static final String DB_PATH = DIR_PATH  + "/favorite.db";
 }

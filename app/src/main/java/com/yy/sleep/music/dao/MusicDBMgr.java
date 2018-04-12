@@ -10,12 +10,12 @@ import com.yy.sleep.music.model.YMBaseModel;
 import java.util.List;
 
 /**
- * Created by archermind on 17-9-6.
+ * Created by yysleep on 17-9-6.
  *
  * @author yysleep
  */
 
-public class MusicDBMgr<T extends YMBaseModel> {
+public class MusicDBMgr {
 
     private static final String TAG = "MusicDBMgr";
     private final String DB_NAME = "music.db";
@@ -42,6 +42,19 @@ public class MusicDBMgr<T extends YMBaseModel> {
         mHelper = new SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
             @Override
             public void onCreate(SQLiteDatabase db) {
+                /*File file = new File(Constant.DB_PATH);
+                boolean isExists = file.exists();
+                if (!isExists) {
+                    try {
+                        isExists = file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                LogUtil.d(TAG, "[MusicDBMgr] isExists = " + isExists);
+                if (isExists) {
+                    db = SQLiteDatabase.openOrCreateDatabase(Constant.DB_PATH, null);
+                }*/
                 FavoriteDao.getInstance().init(db);
             }
 
@@ -53,7 +66,7 @@ public class MusicDBMgr<T extends YMBaseModel> {
         mDbInstance = mHelper.getWritableDatabase();
     }
 
-    public SQLiteDatabase getmDbInstance() {
+    public SQLiteDatabase getDbInstance() {
         return mDbInstance;
     }
 
