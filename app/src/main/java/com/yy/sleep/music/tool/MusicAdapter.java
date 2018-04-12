@@ -2,6 +2,7 @@ package com.yy.sleep.music.tool;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import java.util.List;
  * @author yysleep
  */
 public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollListener {
+    private static final String TAG = "MusicAdapter";
     private Context mContext;
     private LruCacheSys mLruCacheSys;
     private AbsListView mView;
@@ -34,7 +36,7 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
     private int mFristVisibleItem;
     private int mVisibleCount;
     private String name;
-    private static final String TAG = "MusicAdapter";
+    private Bitmap mDefaultBmp;
 
     public MusicAdapter(Context context, List<MusicInfo> musicInfos, AbsListView view, String name) {
         this.mContext = context;
@@ -105,7 +107,10 @@ public class MusicAdapter extends BaseAdapter implements AbsListView.OnScrollLis
         if (bmp != null) {
             iv.setImageBitmap(bmp);
         } else {
-            iv.setImageResource(R.drawable.icon_default_album_art);
+            if (mDefaultBmp == null) {
+                mDefaultBmp = BitmapFactory.decodeResource(iv.getResources(), R.drawable.icon_default_album_art);
+            }
+            iv.setImageBitmap(mDefaultBmp);
         }
     }
 
